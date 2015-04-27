@@ -17,7 +17,7 @@
     License along with this library; If not, see <http://www.gnu.org/licenses/>
 """
 import cadquery
-import OCC.gp.gp_Vec2d
+import OCC.Geom.Geom_Vector as OCCVector
 
 def sortWiresByBuildOrder(wireList, plane, result=[]):
     """
@@ -69,7 +69,7 @@ class Vector(object):
             if type(args[0]) is tuple:
                 #TODO: We've been given a tuple, convert to PythonOCC vector
                 pass
-            elif type(args[0] is FreeCAD.Base.Vector):
+            elif type(args[0] is OCCVector):
                 #TODO: Fix this, we've been given a PythonOCC vector
                 pass
             elif type(args[0] is Vector):
