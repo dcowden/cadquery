@@ -1,14 +1,20 @@
-#these items point to the freecad implementation
-from .freecad_impl.geom import Plane,BoundBox,Vector,Matrix,sortWiresByBuildOrder
-from .freecad_impl.shapes import Shape,Vertex,Edge,Face,Wire,Solid,Shell,Compound
-from .freecad_impl import exporters
-from .freecad_impl import importers
+import os
 
-#these items are the common implementation
+selectedAPI = os.environ.get("CADQUERYAPI")
 
-#the order of these matter
-from .selectors import NearestToPointSelector,ParallelDirSelector,DirectionSelector,PerpendicularDirSelector,TypeSelector,DirectionMinMaxSelector,StringSyntaxSelector,Selector
-from .CQ import CQ,CQContext,Workplane
+if selectedAPI == None or selectedAPI.upper() == 'FREECAD':
+    # These items point to the FreeCAD implementation
+    from .freecad_impl.geom import Plane,BoundBox,Vector,Matrix,sortWiresByBuildOrder
+    from .freecad_impl.shapes import Shape,Vertex,Edge,Face,Wire,Solid,Shell,Compound
+    from .freecad_impl import exporters
+    from .freecad_impl import importers
+else:
+    from .pythonocc_impl.geom import Vector
+
+# These items are the common implementation
+# The order of these matter
+# from .selectors import NearestToPointSelector,ParallelDirSelector,DirectionSelector,PerpendicularDirSelector,TypeSelector,DirectionMinMaxSelector,StringSyntaxSelector,Selector
+# from .CQ import CQ,CQContext,Workplane
 
 
 __all__ = [

@@ -8,6 +8,7 @@ import unittest
 #on py 2.7.x on win
 suite = unittest.TestSuite()
 
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestPythonOCC.TestPythonOCC))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCadObjects.TestCadObjects))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestWorkplanes.TestWorkplanes))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCQSelectors.TestCQSelectors))
