@@ -62,21 +62,19 @@ class Vector(object):
     """
 
     def __init__(self, *args):
-        if len(args) == 3:
+        if len(args) == 3:  # 3 float values
             fV = gp_Vec(args[0], args[1], args[2])
         elif len(args) == 1:
-            if type(args[0]) is tuple:
-                #TODO: We've been given a tuple, convert to PythonOCC vector
-                pass
-            elif type(args[0] is gp_Vec):
-                #TODO: Fix this, we've been given a PythonOCC vector
-                pass
-            elif type(args[0] is Vector):
+            if type(args[0]) is tuple:  # 3-tuple
+                fV = gp_Vec(args[0][0], args[0][1], args[0][2])
+            elif type(args[0]) is gp_Vec:  # PythonOCC vector
+                fV = args[0]
+            elif type(args[0]) is Vector:  # A CQ vector
                 fV = args[0].wrapped
             else:
-                fV = args[0]
+                raise ValueError("Expected three floats, PythonOCC vector, Vector, or 3-tuple")
         else:
-            raise ValueError("Expected three floats, PythonOCC vector, or 3-tuple")
+            raise ValueError("Expected three floats, PythonOCC vector, Vector, or 3-tuple")
 
         self.wrapped = fV
         self.Length = fV.Magnitude()
