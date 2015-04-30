@@ -82,12 +82,20 @@ class Vector(object):
         self.y = fV.Y()
         self.z = fV.Z()
 
+    def copy(self):
+        return Vector(self.x, self.y, self.z)
+
     def toTuple(self):
         return (self.x, self.y, self.z)
 
     #TODO: is it possible to create a dynamic proxy without all this code?
     def cross(self, v):
-        return Vector(self.wrapped.cross(v.wrapped))
+        v0 = self.copy()
+
+        # Cross returns none, so we have to let it modify the v0 vector
+        v0.wrapped.Cross(v.wrapped)
+        
+        return Vector(v0)
 
     def dot(self, v):
         return self.wrapped.dot(v.wrapped)
@@ -102,14 +110,14 @@ class Vector(object):
         """
             Return self multiplied by the provided scalar
         """
-        tmp = Geom_Vector(self.wrapped)
+        tmp = gp_Vec(self.wrapped)
         return Vector(tmp.multiply(scale))
 
     def normalize(self):
         """
             Return normalized version this vector.
         """
-        tmp = Geom_Vector(self.wrapped)
+        tmp = gp_Vec(self.wrapped)
         tmp.normalize()
         return Vector(tmp)
 
