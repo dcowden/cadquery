@@ -94,14 +94,22 @@ class Vector(object):
 
         # Cross returns none, so we have to let it modify the v0 vector
         v0.wrapped.Cross(v.wrapped)
-        
-        return Vector(v0)
+
+        return Vector(v0.wrapped)
 
     def dot(self, v):
-        return self.wrapped.dot(v.wrapped)
+        v0 = self.copy()
+
+        dP = v0.wrapped.Dot(v.wrapped)
+
+        return dP
 
     def sub(self, v):
-        return self.wrapped.sub(v.wrapped)
+        v0 = self.copy()
+
+        v0.wrapped.Subtract(v.wrapped)
+
+        return Vector(v0.wrapped)
 
     def add(self, v):
         return Vector(self.wrapped.add(v.wrapped))

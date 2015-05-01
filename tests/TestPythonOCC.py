@@ -29,5 +29,21 @@ class TestPythonOCC(unittest.TestCase):
 
         self.assertEquals((-15.0, -2.0, 39.0), v3.toTuple())
 
+    def testVectorDot(self):
+        v1 = Vector(1, 2, 3)
+        v2 = Vector(4, -5, 6)
+
+        dP = v1.dot(v2)
+
+        self.assertEquals(dP, 12)
+
+    def testVectorSubtract(self):
+        v1 = Vector(1, 2, 3)
+        v2 = Vector(3, 2, 1)
+
+        v3 = v1.sub(v2)
+
+        self.assertEquals((-2, 0, 2), v3.toTuple())
+
 if __name__ == '__main__':
     unittest.main()
