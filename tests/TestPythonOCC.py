@@ -7,10 +7,10 @@ from cadquery.pythonocc_impl.geom import Vector
 from OCC.gp import gp_Vec
 
 class TestPythonOCC(unittest.TestCase):
-    #TODO: Take this out and use the one in tests/__init__.py
-    def assertTupleAlmostEquals(self, expected, actual, places):
+    #TODO: Merge this with the one in tests/__init__.py
+    def assertTupleAlmostEquals(self, expected, actual, places, msg):
         for i, j in zip(actual, expected):
-            self.assertAlmostEquals(i, j, places)
+            self.assertAlmostEquals(i, j, places, msg)
 
     def testVectorConstructors(self):
         v1 = Vector(1, 2, 3)
@@ -19,12 +19,12 @@ class TestPythonOCC(unittest.TestCase):
         v4 = Vector(Vector(1, 2, 3))
 
         for v in [v1, v2, v3, v4]:
-            self.assertEquals((1, 2, 3), v.toTuple(), 4)
+            self.assertEquals((1, 2, 3), v.toTuple(), "A Vector object did not get constructed correctly: " + str(v))
 
     def testVectorLength(self):
         v1 = Vector(1, 2, 3)
 
-        self.assertAlmostEquals(v1.Length, 3.74165738677)
+        self.assertAlmostEquals(v1.Length, 3.74165738677, 3, "The length of a Vector object was calculated incorrectly: " + str(v1))
 
     def testVectorCross(self):
         v1 = Vector(3, -3, 1)
@@ -32,7 +32,7 @@ class TestPythonOCC(unittest.TestCase):
 
         v3 = v1.cross(v2)
 
-        self.assertEquals((-15.0, -2.0, 39.0), v3.toTuple())
+        self.assertEquals((-15.0, -2.0, 39.0), v3.toTuple(), "The cross product of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorDot(self):
         v1 = Vector(1, 2, 3)
@@ -40,7 +40,7 @@ class TestPythonOCC(unittest.TestCase):
 
         dP = v1.dot(v2)
 
-        self.assertEquals(dP, 12)
+        self.assertEquals(dP, 12, "The dot product of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorSubtract(self):
         v1 = Vector(1, 2, 3)
@@ -48,7 +48,7 @@ class TestPythonOCC(unittest.TestCase):
 
         v3 = v1.sub(v2)
 
-        self.assertEquals((-2, 0, 2), v3.toTuple())
+        self.assertEquals((-2, 0, 2), v3.toTuple(), "The subtraction of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorAdd(self):
         v1 = Vector(1, 2, 3)
@@ -56,7 +56,7 @@ class TestPythonOCC(unittest.TestCase):
 
         v3 = v1.add(v2)
 
-        self.assertEquals((4, 4, 4), v3.toTuple())
+        self.assertEquals((4, 4, 4), v3.toTuple(), "The addition of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorMultiply(self):
         v1 = Vector(1, 2, 3)
@@ -64,14 +64,14 @@ class TestPythonOCC(unittest.TestCase):
 
         v2 = v1.multiply(scale)
 
-        self.assertEquals((2, 4, 6), v2.toTuple())
+        self.assertEquals((2, 4, 6), v2.toTuple(), "The multiplication of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorNormalize(self):
         v1 = Vector(1, 2, 3)
 
         vN = v1.normalize()
 
-        self.assertTupleAlmostEquals((0.267, 0.535, 0.802), vN.toTuple(), 3)
+        self.assertTupleAlmostEquals((0.267, 0.535, 0.802), vN.toTuple(), 3, "A Vector object was normalized incorrectly: " + str(v1))
 
     def testVectorGetAngle(self):
         v1 = Vector(1, 2, 3)
@@ -79,7 +79,7 @@ class TestPythonOCC(unittest.TestCase):
 
         angle = v1.getAngle(v2)
 
-        self.assertAlmostEquals(0.775, angle, 3)
+        self.assertAlmostEquals(0.775, angle, 3, "The angle between two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorInternals(self):
         v1 = Vector(1, 2, 3)
@@ -94,10 +94,10 @@ class TestPythonOCC(unittest.TestCase):
 
         # Just test that the others don't raise exceptions, but make sure these give correct values
         len = v1.__len__()
-        self.assertAlmostEquals(3.742, len, 3)
+        self.assertAlmostEquals(3.742, len, 3, "The length of a Vector object was calculated incorrectly: " + str(self))
 
         equal = v1.__eq__(v4)
-        self.assertFalse(equal)
+        self.assertFalse(equal, "Two Vector objects that should not have been equal show equality: " + str(v1) + " - " + str(v4))
         equal = v1.__eq__(v3)
         self.assertTrue(equal)
 
