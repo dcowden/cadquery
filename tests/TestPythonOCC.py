@@ -19,7 +19,7 @@ class TestPythonOCC(unittest.TestCase):
         v4 = Vector(Vector(1, 2, 3))
 
         for v in [v1, v2, v3, v4]:
-            self.assertEquals((1, 2, 3), v.toTuple(), "A Vector object did not get constructed correctly: " + str(v))
+            self.assertEqual((1, 2, 3), v.toTuple(), "A Vector object did not get constructed correctly: " + str(v))
 
     def testVectorLength(self):
         v1 = Vector(1, 2, 3)
@@ -32,7 +32,7 @@ class TestPythonOCC(unittest.TestCase):
 
         v3 = v1.cross(v2)
 
-        self.assertEquals((-15.0, -2.0, 39.0), v3.toTuple(), "The cross product of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
+        self.assertEqual((-15.0, -2.0, 39.0), v3.toTuple(), "The cross product of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorDot(self):
         v1 = Vector(1, 2, 3)
@@ -40,7 +40,7 @@ class TestPythonOCC(unittest.TestCase):
 
         dP = v1.dot(v2)
 
-        self.assertEquals(dP, 12, "The dot product of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
+        self.assertEqual(dP, 12, "The dot product of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorSubtract(self):
         v1 = Vector(1, 2, 3)
@@ -48,7 +48,7 @@ class TestPythonOCC(unittest.TestCase):
 
         v3 = v1.sub(v2)
 
-        self.assertEquals((-2, 0, 2), v3.toTuple(), "The subtraction of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
+        self.assertEqual((-2, 0, 2), v3.toTuple(), "The subtraction of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorAdd(self):
         v1 = Vector(1, 2, 3)
@@ -56,7 +56,7 @@ class TestPythonOCC(unittest.TestCase):
 
         v3 = v1.add(v2)
 
-        self.assertEquals((4, 4, 4), v3.toTuple(), "The addition of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
+        self.assertEqual((4, 4, 4), v3.toTuple(), "The addition of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorMultiply(self):
         v1 = Vector(1, 2, 3)
@@ -64,7 +64,7 @@ class TestPythonOCC(unittest.TestCase):
 
         v2 = v1.multiply(scale)
 
-        self.assertEquals((2, 4, 6), v2.toTuple(), "The multiplication of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
+        self.assertEqual((2, 4, 6), v2.toTuple(), "The multiplication of two Vector objects was calculated incorrectly: " + str(v1) + " - " + str(v2))
 
     def testVectorNormalize(self):
         v1 = Vector(1, 2, 3)
