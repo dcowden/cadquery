@@ -83,13 +83,26 @@ class Vector(object):
         self.z = fV.Z()
 
     def copy(self):
+        """
+        Returns a copy of this vector to avoid mutations
+        :return: A new vector with the same X, Y, and Z values as this Vector
+        """
         return Vector(self.x, self.y, self.z)
 
     def toTuple(self):
+        """
+        Collect the X, Y, and Z values of this vector into a tuple
+        :return: A tuple representing the X, Y, and Z of this Vector
+        """
         return (self.x, self.y, self.z)
 
     #TODO: is it possible to create a dynamic proxy without all this code?
     def cross(self, v):
+        """
+        Return the cross product of self and v
+        :param v: The vector to take the cross product of with self
+        :return: A Vector representing the cross product of self and v
+        """
         v0 = self.copy()
 
         # Cross returns none, so we have to let it modify the v0 vector
@@ -98,6 +111,11 @@ class Vector(object):
         return Vector(v0.wrapped)
 
     def dot(self, v):
+        """
+        Return the dot product of self and v
+        :param v: The vector to take the dot product of with self
+        :return: A scalar representing the dot product of self and v
+        """
         v0 = self.copy()
 
         dP = v0.wrapped.Dot(v.wrapped)
@@ -105,6 +123,11 @@ class Vector(object):
         return dP
 
     def sub(self, v):
+        """
+        Return the provided vector subtracted from self
+        :param v: The Vector to subtract from self
+        :return: A new Vector object that is the subtracted product of self and v
+        """
         v0 = self.copy()
 
         v0.wrapped.Subtract(v.wrapped)
@@ -112,22 +135,39 @@ class Vector(object):
         return Vector(v0.wrapped)
 
     def add(self, v):
-        return Vector(self.wrapped.add(v.wrapped))
+        """
+        Return self added to the provided vector
+        :param v: The Vector to add to self
+        :return: A new Vector object that is the added product of self and v
+        """
+        v0 = self.copy()
+
+        v0.wrapped.Add(v.wrapped)
+
+        return Vector(v0.wrapped)
 
     def multiply(self, scale):
         """
-            Return self multiplied by the provided scalar
+        Return self multiplied by the provided scalar
+        :param scale: The scalar to multiply this Vector by
+        :return: A new Vector object that is this Vector multiplied by the scalar
         """
-        tmp = gp_Vec(self.wrapped)
-        return Vector(tmp.multiply(scale))
+        v0 = self.copy()
+
+        v0.wrapped.Multiply(scale)
+
+        return Vector(v0.wrapped)
 
     def normalize(self):
         """
-            Return normalized version this vector.
+        Return normalized version this vector
+        :return: A new Vector object that is a normalized copy of this Vector
         """
-        tmp = gp_Vec(self.wrapped)
-        tmp.normalize()
-        return Vector(tmp)
+        v0 = self.copy()
+
+        v0.wrapped.Normalize()
+
+        return Vector(v0.wrapped)
 
     def Center(self):
         """
@@ -138,7 +178,16 @@ class Vector(object):
         return self
 
     def getAngle(self, v):
-        return self.wrapped.getAngle(v.wrapped)
+        """
+        Returns the angle between the two vectors self and v
+        :param v: The other vector to use with self to find the angle
+        :return:
+        """
+        v0 = self.copy()
+
+        angle = v0.wrapped.Angle(v.wrapped)
+
+        return angle
 
     def distanceToLine(self):
         raise NotImplementedError("Not implemented yet.")
@@ -155,7 +204,7 @@ class Vector(object):
     def __hash__(self):
         return self.wrapped.__hash__()
 
-    def __add__(self,v):
+    def __add__(self, v):
         return self.add(v)
 
     def __len__(self):
@@ -167,23 +216,24 @@ class Vector(object):
     def __str__(self):
         return self.wrapped.__str__()
 
-    def __len__(self,other):
-        return self.wrapped.__len__(other)
+    def __eq__(self, other):
+        return self.wrapped.IsEqual(other.wrapped, 3, 3)
 
-    def __lt__(self,other):
-        return self.wrapped.__lt__(other)
+    # TODO: Not sure of the meaning or usefulness of this
+    # def __len__(self, other):
+    #     return self.wrapped.__len__(other)
 
-    def __gt__(self,other):
-        return self.wrapped.__gt__(other)
+    def __lt__(self, other):
+        raise NotImplementedError("Not implemented yet.")
 
-    def __ne__(self,other):
-        return self.wrapped.__ne__(other)
+    def __gt__(self, other):
+        raise NotImplementedError("Not implemented yet.")
 
-    def __le__(self,other):
-        return self.wrapped.__le__(other)
+    def __ne__(self, other):
+        raise NotImplementedError("Not implemented yet.")
 
-    def __ge__(self,other):
-        return self.wrapped.__ge__(other)
+    def __le__(self, other):
+        raise NotImplementedError("Not implemented yet.")
 
-    def __eq__(self,other):
-        return self.wrapped.__eq__(other)
+    def __ge__(self, other):
+        raise NotImplementedError("Not implemented yet.")
