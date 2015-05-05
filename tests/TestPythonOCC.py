@@ -1,9 +1,10 @@
 import unittest
+import math
 
 import sys
 sys.path.insert(0, '/home/jwright/Downloads/cadquery/')
 
-from cadquery.pythonocc_impl.geom import Vector
+from cadquery.pythonocc_impl.geom import Vector, Matrix
 from OCC.gp import gp_Vec
 
 class TestPythonOCC(unittest.TestCase):
@@ -100,6 +101,14 @@ class TestPythonOCC(unittest.TestCase):
         self.assertFalse(equal, "Two Vector objects that should not have been equal show equality: " + str(v1) + " - " + str(v4))
         equal = v1.__eq__(v3)
         self.assertTrue(equal)
+
+    def testMatrixRotation(self):
+        m1 = Matrix()
+
+        m2 = m1.rotateX(math.pi)
+        m3 = m1.rotateY(math.pi)
+
+        print str(m2) + str(m3)
 
 if __name__ == '__main__':
     unittest.main()

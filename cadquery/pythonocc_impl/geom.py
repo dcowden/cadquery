@@ -17,7 +17,7 @@
     License along with this library; If not, see <http://www.gnu.org/licenses/>
 """
 import cadquery
-from OCC.gp import gp_Vec
+from OCC.gp import gp_Vec, gp_Trsf, gp_OX, gp_OY
 
 def sortWiresByBuildOrder(wireList, plane, result=[]):
     """
@@ -237,3 +237,44 @@ class Vector(object):
 
     def __ge__(self, other):
         raise NotImplementedError("Not implemented yet.")
+
+class Matrix:
+    """
+    A 3D transformation matrix used to move geometry in space.
+    """
+    def __init__(self, matrix=None):
+        if matrix is None:
+            self.wrapped = gp_Trsf()
+        else:
+            self.wrapped = matrix
+
+    def copy(self):
+        """
+        Returns a copy of this matrix to avoid mutations.
+        :return: A copy with the same matrix contents
+        """
+        return Matrix(self.wrapped)
+
+    def rotateX(self, angle):
+        """
+        Rotates the matrix around the X axis.
+        :param angle: The angle of rotation in radians
+        :return: A copy of this matrix rotated by the given angle
+        """
+        m0 = self.copy()
+
+        m0.wrapped.SetRotation(gp_OX(), angle)
+
+        return m0
+
+    def rotateY(self, angle):
+        """
+        Rotates the matrix around the Y axis.
+        :param angle: The angle of rotation in radians
+        :return: A copy of this matrix rotated by the given angle
+        """
+        m0 = self.copy()
+
+        m0.wrapped.SetRotation(gp_OY(), angle)
+
+        return m0
