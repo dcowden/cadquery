@@ -4,7 +4,7 @@ import math
 import sys
 sys.path.insert(0, '/home/jwright/Downloads/cadquery/')
 
-from cadquery.pythonocc_impl.geom import Vector, Matrix
+from cadquery.pythonocc_impl.geom import Vector, Matrix, Plane
 from OCC.gp import gp_Vec
 
 class TestPythonOCC(unittest.TestCase):
@@ -104,11 +104,41 @@ class TestPythonOCC(unittest.TestCase):
 
     def testMatrixRotation(self):
         m1 = Matrix()
+        m2 = Matrix()
+        m3 = Matrix()
 
-        m2 = m1.rotateX(math.pi)
-        m3 = m1.rotateY(math.pi)
+        m1.rotateX(math.pi)
+        m2.rotateY(math.pi * 1.5)
 
-        print str(m2) + str(m3)
+        v1 = gp_Vec(0, 0, 0)
+        angle = 0.0
+        print m1.wrapped.GetRotation().GetVectorAndAngle(v1, angle)
+
+        self.assertAlmostEquals(3.142, m1.wrapped.GetRotation().GetRotationAngle(), 3)
+        self.assertAlmostEquals(1.571, m2.wrapped.GetRotation().GetRotationAngle(), 3)
+
+    def testNamedPlaneConstructor(self):
+        # p1 and p2 should be the same outcome
+        p1 = Plane((0, 0, 0), (1, 0, 0), (0, 0, 1))
+        p2 = Plane.named('XY')
+
+        # Just test to make sure these don't throw an error
+        p3 = Plane.named('bottom', (1, 1, 1))
+        p4 = Plane.named('YZ', Vector(0, 0, 0))
+
+        # The rG and fG Vectors of p1 and p2 should be the same
+        for i in [1, 2, 3]:
+            for j in [1, 2, 3]:
+                self.assertEquals(p1.rG.Value(i, j), p2.rG.Value(i, j))
+
+        # TODO: Fix this once the limit of 3 dimensions with gp_Mat is resolved
+        # for i in [1, 2, 3]:
+        #     self.assertEquals(p1.fG.Value(i, 4), p2.fG.Value(i, 4))
+
+        # The normals of p1 and p2 should be the same, as should their inverses
+        self.assertEquals(p1.zDir, p2.zDir)
+        self.assertEquals(p1.invZDir, p2.invZDir)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -17,7 +17,7 @@
     License along with this library; If not, see <http://www.gnu.org/licenses/>
 """
 import cadquery
-from OCC.gp import gp_Vec, gp_Trsf, gp_OX, gp_OY
+from OCC.gp import gp_Vec, gp_Trsf, gp_Mat, gp_OX, gp_OY
 
 def sortWiresByBuildOrder(wireList, plane, result=[]):
     """
@@ -103,12 +103,9 @@ class Vector(object):
         :param v: The vector to take the cross product of with self
         :return: A Vector representing the cross product of self and v
         """
-        v0 = self.copy()
 
-        # Cross returns none, so we have to let it modify the v0 vector
-        v0.wrapped.Cross(v.wrapped)
-
-        return Vector(v0.wrapped)
+        v0 = self.wrapped.Crossed(v.wrapped)
+        return Vector(v0)
 
     def dot(self, v):
         """
@@ -116,10 +113,8 @@ class Vector(object):
         :param v: The vector to take the dot product of with self
         :return: A scalar representing the dot product of self and v
         """
-        v0 = self.copy()
 
-        dP = v0.wrapped.Dot(v.wrapped)
-
+        dP = self.wrapped.Dot(v.wrapped)
         return dP
 
     def sub(self, v):
@@ -128,11 +123,9 @@ class Vector(object):
         :param v: The Vector to subtract from self
         :return: A new Vector object that is the subtracted product of self and v
         """
-        v0 = self.copy()
 
-        v0.wrapped.Subtract(v.wrapped)
-
-        return Vector(v0.wrapped)
+        v0 = self.wrapped.Subtracted(v.wrapped)
+        return Vector(v0)
 
     def add(self, v):
         """
@@ -140,11 +133,9 @@ class Vector(object):
         :param v: The Vector to add to self
         :return: A new Vector object that is the added product of self and v
         """
-        v0 = self.copy()
 
-        v0.wrapped.Add(v.wrapped)
-
-        return Vector(v0.wrapped)
+        v0 = self.wrapped.Added(v.wrapped)
+        return Vector(v0)
 
     def multiply(self, scale):
         """
@@ -152,22 +143,18 @@ class Vector(object):
         :param scale: The scalar to multiply this Vector by
         :return: A new Vector object that is this Vector multiplied by the scalar
         """
-        v0 = self.copy()
 
-        v0.wrapped.Multiply(scale)
-
-        return Vector(v0.wrapped)
+        v0 = self.wrapped.Multiplied(scale)
+        return Vector(v0)
 
     def normalize(self):
         """
         Return normalized version this vector
         :return: A new Vector object that is a normalized copy of this Vector
         """
-        v0 = self.copy()
 
-        v0.wrapped.Normalize()
-
-        return Vector(v0.wrapped)
+        v0 = self.wrapped.Normalized()
+        return Vector(v0)
 
     def Center(self):
         """
@@ -183,10 +170,8 @@ class Vector(object):
         :param v: The other vector to use with self to find the angle
         :return:
         """
-        v0 = self.copy()
 
-        angle = v0.wrapped.Angle(v.wrapped)
-
+        angle = self.wrapped.Angle(v.wrapped)
         return angle
 
     def distanceToLine(self):
@@ -278,3 +263,136 @@ class Matrix:
         m0.wrapped.SetRotation(gp_OY(), angle)
 
         return m0
+
+class Plane:
+    """
+    A 2d coordinate system in space, with the X-Y axes on the a plane, and a particular point as the origin.
+
+    A plane allows the use of 2d coordinates, which are later converted to global, 3d coordinates when
+    the operations are complete.
+
+    Frequently, it is not necessary to create work planes, as they can be created automatically from faces.
+    """
+
+    def __init__(self, origin, xDir, normal):
+        """
+        Create a Plane with an arbitrary orientation
+
+        TODO: project x and y vectors so they work even if not orthogonal
+        :param origin: the origin
+        :type origin: a three-tuple of the origin, in global coordinates
+        :param xDir: a vector representing the xDirection.
+        :type xDir: a three-tuple representing a Vector, or a PythonOCC Vector
+        :param normal: the normal direction for the new plane
+        :type normal: a Vector
+        :raises: ValueError if the specified xDir is not orthogonal to the provided normal.
+        :return: a plane in the global space, with the xDirection of the plane in the specified direction.
+        """
+
+        # Support tuples instead of forcing the use of vectors
+        if type(origin) is tuple:
+            origin = Vector(origin)
+        if type(xDir) is tuple:
+            xDir = Vector(xDir)
+        if type(normal) is tuple:
+            normal = Vector(normal)
+
+        self.xDir = xDir.normalize()
+        self.yDir = normal.cross(self.xDir).normalize()
+        self.zDir = normal.normalize()
+
+        self.invZDir = self.zDir.multiply(-1.0)
+
+        self.setOrigin3d(origin)
+
+    @classmethod
+    def named(cls, stdName, origin=(0, 0, 0)):
+        """
+        Create a predefined Plane based on the conventional names.
+
+        :param stdName: one of (XY|YZ|XZ|front|back|left|right|top|bottom
+        :type stdName: string
+        :param origin: the desired origin, specified in global coordinates
+        :type origin: 3-tuple of the origin of the new plane, in global coordinates.
+
+        Available named planes are as follows. Direction references refer to the global
+        directions
+
+        =========== ======= ======= ======
+        Name        xDir    yDir    zDir
+        =========== ======= ======= ======
+        XY          +x      +y      +z
+        YZ          +y      +z      +x
+        XZ          +x      +z      -y
+        front       +x      +y      +z
+        back        -x      +y      -z
+        left        +z      +y      -x
+        right       -z      +y      +x
+        top         +x      -z      +y
+        bottom      +x      +z      -y
+        =========== ======= ======= ======
+        """
+
+        namedPlanes = {
+            # origin, xDir, normal
+            'XY': Plane(Vector(origin), Vector((1, 0, 0)), Vector((0, 0, 1))),
+            'YZ': Plane(Vector(origin), Vector((0, 1, 0)), Vector((1, 0, 0))),
+            'XZ': Plane(Vector(origin), Vector((1, 0, 0)), Vector((0, -1, 0))),
+            'front': Plane(Vector(origin), Vector((1, 0, 0)), Vector((0, 0, 1))),
+            'back': Plane(Vector(origin), Vector((-1, 0, 0)), Vector((0, 0, -1))),
+            'left': Plane(Vector(origin), Vector((0, 0, 1)), Vector((-1, 0, 0))),
+            'right': Plane(Vector(origin), Vector((0, 0, -1)), Vector((1, 0, 0))),
+            'top': Plane(Vector(origin), Vector((1, 0, 0)), Vector((0, 1, 0))),
+            'bottom': Plane(Vector(origin), Vector((1, 0, 0)), Vector((0, -1, 0)))
+        }
+
+        if stdName in namedPlanes:
+            return namedPlanes[stdName]
+        else:
+            raise ValueError("Supported names are %s " % str(namedPlanes.keys()))
+
+    def setOrigin3d(self, originVector):
+        """
+        Move the origin of the plane, leaving its orientation and xDirection unchanged.
+        :param originVector: the new center of the plane, *global* coordinates
+        :type originVector: a Vector
+        :return: void
+        """
+
+        # Support tuples that are used as Vectors
+        if type(originVector) is tuple:
+            originVector = Vector(originVector)
+
+        self.origin = originVector
+        self._calcTransforms()
+
+    def _calcTransforms(self):
+        """
+        Computes transformation matrices to convert between local and global coordinates
+        """
+
+        # r is the forward transformation matrix from world to local coordinates
+        r = gp_Mat()
+
+        # Forward transform must rotate and adjust for origin
+        r.SetValue(1, 1, self.xDir.x)  # A11
+        r.SetValue(1, 2, self.xDir.y)  # A12
+        r.SetValue(1, 3, self.xDir.z)  # A13
+        r.SetValue(2, 1, self.yDir.x)  # A21
+        r.SetValue(2, 2, self.yDir.y)  # A22
+        r.SetValue(2, 3, self.yDir.z)  # A23
+        r.SetValue(3, 1, self.zDir.x)  # A31
+        r.SetValue(3, 2, self.zDir.y)  # A32
+        r.SetValue(3, 3, self.zDir.z)  # A33
+
+        invR = r.Inverted()
+
+        # TODO: gp_Mat doesn't support 4 dimensions, figure out what to do
+        # invR.SetValue(1, 4, self.origin.x)  # A14
+        # invR.SetValue(2, 4, self.origin.y)  # A24
+        # invR.SetValue(3, 4, self.origin.z)  # A34
+
+        # (invR.A14, invR.A24, invR.A34) = (self.origin.x, self.origin.y, self.origin.z)
+
+        # TODO: This double inversion may not be needed with PythonOCC, find out
+        (self.rG, self.fG) = (invR, invR.Inverted())
