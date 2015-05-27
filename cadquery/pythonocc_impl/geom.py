@@ -351,6 +351,42 @@ class Plane:
         else:
             raise ValueError("Supported names are %s " % str(namedPlanes.keys()))
 
+    @classmethod
+    def XY(cls, origin=(0, 0, 0)):
+        return Plane.named('XY', origin)
+
+    @classmethod
+    def YZ(cls, origin=(0, 0, 0)):
+        return Plane.named('YZ', origin)
+
+    @classmethod
+    def XZ(cls, origin=(0, 0, 0)):
+        return Plane.named('XZ', origin)
+
+    @classmethod
+    def front(cls, origin=(0, 0, 0)):
+        return Plane.named('front', origin)
+
+    @classmethod
+    def back(cls, origin=(0, 0, 0)):
+        return Plane.named('back', origin)
+
+    @classmethod
+    def left(cls, origin=(0, 0, 0)):
+        return Plane.named('left', origin)
+
+    @classmethod
+    def right(cls, origin=(0, 0, 0)):
+        return Plane.named('right', origin)
+
+    @classmethod
+    def top(cls, origin=(0, 0, 0)):
+        return Plane.named('top', origin)
+
+    @classmethod
+    def bottom(cls, origin=(0, 0, 0)):
+        return Plane.named('bottom', origin)
+
     def setOrigin3d(self, originVector):
         """
         Move the origin of the plane, leaving its orientation and xDirection unchanged.
@@ -364,35 +400,79 @@ class Plane:
             originVector = Vector(originVector)
 
         self.origin = originVector
-        self._calcTransforms()
+        # self._calcTransforms()
 
-    def _calcTransforms(self):
+    def setOrigin2d(self, x, y):
         """
-        Computes transformation matrices to convert between local and global coordinates
+            Set a new origin based off the plane. The plane's orientation and x direction are unaffected.
+
+            :param float x: offset in the x direction
+            :param float y: offset in the y direction
+            :return: void
+
+            The new coordinates are specified in terms of the current 2-d system. As an example:
+                p = Plane.XY()
+                p.setOrigin2d(2,2)
+                p.setOrigin2d(2,2)
+
+            results in a plane with its origin at (x,y)=(4,4) in global coordinates. The both operations were relative
+            to the local coordinates of the plane.
+
         """
+        self.setOrigin3d(self.toWorldCoords((x, y)))
 
-        # r is the forward transformation matrix from world to local coordinates
-        r = gp_Mat()
+    def toLocalCoords(self, obj):
+        """
+            Project the provided coordinates onto this plane.
 
-        # Forward transform must rotate and adjust for origin
-        r.SetValue(1, 1, self.xDir.x)  # A11
-        r.SetValue(1, 2, self.xDir.y)  # A12
-        r.SetValue(1, 3, self.xDir.z)  # A13
-        r.SetValue(2, 1, self.yDir.x)  # A21
-        r.SetValue(2, 2, self.yDir.y)  # A22
-        r.SetValue(2, 3, self.yDir.z)  # A23
-        r.SetValue(3, 1, self.zDir.x)  # A31
-        r.SetValue(3, 2, self.zDir.y)  # A32
-        r.SetValue(3, 3, self.zDir.z)  # A33
+            :param obj: an object or vector to convert
+            :type vector: a vector or shape
+            :return: an object of the same type as the input, but converted to local coordinates
 
-        invR = r.Inverted()
 
-        # TODO: gp_Mat doesn't support 4 dimensions, figure out what to do
-        # invR.SetValue(1, 4, self.origin.x)  # A14
-        # invR.SetValue(2, 4, self.origin.y)  # A24
-        # invR.SetValue(3, 4, self.origin.z)  # A34
+            Most of the time, the z-coordinate returned will be zero, because most operations
+            based on a plane are all 2-d. Occasionally, though, 3-d points outside of the current plane are transformed.
+            One such example is :py:meth:`Workplane.box`, where 3-d corners of a box are transformed to orient the box
+            in space correctly.
+        """
+        if isinstance(obj, Vector):
+            # TODO: Rework this to work with PythonOCC instead of the complicated FreeCAD way
+            # return Vector(self.fG.multiply(obj.wrapped))
+            pass
+        elif isinstance(obj, cadquery.Shape):
+            # TODO: Rework this
+            # return obj.transformShape(self.rG)
+            pass
+        else:
+            raise ValueError("Dont know how to convert type %s to local coordinates" % str(type(obj)))
 
-        # (invR.A14, invR.A24, invR.A34) = (self.origin.x, self.origin.y, self.origin.z)
-
-        # TODO: This double inversion may not be needed with PythonOCC, find out
-        (self.rG, self.fG) = (invR, invR.Inverted())
+    # def _calcTransforms(self):
+    #     """
+    #     Computes transformation matrices to convert between local and global coordinates
+    #     """
+    #
+    #     # r is the forward transformation matrix from world to local coordinates
+    #     r = gp_Mat()
+    #
+    #     # Forward transform must rotate and adjust for origin
+    #     r.SetValue(1, 1, self.xDir.x)  # A11
+    #     r.SetValue(1, 2, self.xDir.y)  # A12
+    #     r.SetValue(1, 3, self.xDir.z)  # A13
+    #     r.SetValue(2, 1, self.yDir.x)  # A21
+    #     r.SetValue(2, 2, self.yDir.y)  # A22
+    #     r.SetValue(2, 3, self.yDir.z)  # A23
+    #     r.SetValue(3, 1, self.zDir.x)  # A31
+    #     r.SetValue(3, 2, self.zDir.y)  # A32
+    #     r.SetValue(3, 3, self.zDir.z)  # A33
+    #
+    #     invR = r.Inverted()
+    #
+    #     # TODO: gp_Mat doesn't support 4 dimensions, figure out what to do
+    #     # invR.SetValue(1, 4, self.origin.x)  # A14
+    #     # invR.SetValue(2, 4, self.origin.y)  # A24
+    #     # invR.SetValue(3, 4, self.origin.z)  # A34
+    #
+    #     # (invR.A14, invR.A24, invR.A34) = (self.origin.x, self.origin.y, self.origin.z)
+    #
+    #     # TODO: This double inversion may not be needed with PythonOCC, find out
+    #     (self.rG, self.fG) = (invR, invR.Inverted())

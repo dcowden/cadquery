@@ -121,24 +121,28 @@ class TestPythonOCC(unittest.TestCase):
         # p1 and p2 should be the same outcome
         p1 = Plane((0, 0, 0), (1, 0, 0), (0, 0, 1))
         p2 = Plane.named('XY')
+        p3 = Plane.XY()
 
         # Just test to make sure these don't throw an error
-        p3 = Plane.named('bottom', (1, 1, 1))
-        p4 = Plane.named('YZ', Vector(0, 0, 0))
+        Plane.named('bottom', (1, 1, 1))
+        Plane.named('YZ', Vector(0, 0, 0))
 
-        # The rG and fG Vectors of p1 and p2 should be the same
-        for i in [1, 2, 3]:
-            for j in [1, 2, 3]:
-                self.assertEquals(p1.rG.Value(i, j), p2.rG.Value(i, j))
-
-        # TODO: Fix this once the limit of 3 dimensions with gp_Mat is resolved
-        # for i in [1, 2, 3]:
-        #     self.assertEquals(p1.fG.Value(i, 4), p2.fG.Value(i, 4))
-
-        # The normals of p1 and p2 should be the same, as should their inverses
+        # The normals of p1, p2 and p3 should be the same, as should their inverses
         self.assertEquals(p1.zDir, p2.zDir)
         self.assertEquals(p1.invZDir, p2.invZDir)
+        self.assertEquals(p1.zDir, p3.zDir)
+        self.assertEquals(p1.invZDir, p3.invZDir)
 
+        # The origins of p1, p2 and p3 should be the same
+        self.assertEquals(p1.origin, p2.origin)
+        self.assertEquals(p2.origin, p3.origin)
+
+    def testSet2DOrigin(self):
+        p = Plane.XY()
+        p.setOrigin2d(2, 2)
+        p.setOrigin2d(2, 2)
+
+        self.assertEquals((4, 4, 0), p.origin)
 
 if __name__ == '__main__':
     unittest.main()
