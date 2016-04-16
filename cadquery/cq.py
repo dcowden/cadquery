@@ -2363,9 +2363,6 @@ class Workplane(CQ):
 
         def _makebox(pnt):
 
-            if type(length) is tuple or type(length) is list:
-            	length,width,height = length[0],length[1],length[2]
-
             #(xp,yp,zp) = self.plane.toLocalCoords(pnt)
             (xp, yp, zp) = pnt.toTuple()
             if centered[0]:
@@ -2376,6 +2373,9 @@ class Workplane(CQ):
                 zp -= (height / 2.0)
 
             return Solid.makeBox(length, width, height, Vector(xp, yp, zp))
+
+        if type(length) is tuple or type(length) is list:
+            length,width,height = length[0],length[1],length[2]
 
         boxes = self.eachpoint(_makebox, True)
 
