@@ -2318,7 +2318,7 @@ class Workplane(CQ):
 
         return Compound.makeCompound(toFuse)
 
-    def box(self, length, width, height, centered=(True, True, True), combine=True, clean=True):
+    def box(self, vector=None, length, width, height, centered=(True, True, True), combine=True, clean=True):
         """
         Return a 3d box with specified dimensions for each object on the stack.
 
@@ -2362,6 +2362,9 @@ class Workplane(CQ):
         """
 
         def _makebox(pnt):
+
+            if vector is not None:
+                length, width, height  = vector
 
             #(xp,yp,zp) = self.plane.toLocalCoords(pnt)
             (xp, yp, zp) = pnt.toTuple()
