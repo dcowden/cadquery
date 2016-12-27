@@ -1,21 +1,111 @@
-#these items point to the freecad implementation
-from .freecad_impl.geom import Plane,BoundBox,Vector,Matrix,sortWiresByBuildOrder
-from .freecad_impl.shapes import Shape,Vertex,Edge,Face,Wire,Solid,Shell,Compound
-from .freecad_impl import exporters
-from .freecad_impl import importers
+import sys, logging
+import traceback
 
-#these items are the common implementation
+"""
+    the order of these imports matter,
+    it is important to prevent circular dependencies between the backend
+    and core functions.
 
-#the order of these matter
-from .selectors import *
-from .cq import *
+    The overall order is:
+
+    Shapes
+    Core Operations
+    Backends ( should only depend on the two above)
+    
+    Everything Else
+    
+"""
+import os
+
+CQ_BACKEND_ENV_VAR="CQ_BACKEND"
+
+class CQ_Backends:
+    PYTHONOCC="pythonOCC"
+    FREECAD="FreeCAD"
+
+log = logging.getLogger("cq_init")    
+
+                 
+# the import order is important.
+# we need to get the base classes that the backend implementation needs,
+# then we need to import the rest
+from .core.config import *
+from .core.context import *
+from .core.operations import *
+from .core.shapes import *
+from .core.exporter import *
+from .core.importer import *
 
 
-__all__ = [
-    'CQ','Workplane','plugins','selectors','Plane','BoundBox','Matrix','Vector','sortWiresByBuildOrder',
-    'Shape','Vertex','Edge','Wire','Face','Solid','Shell','Compound','exporters', 'importers',
-    'NearestToPointSelector','ParallelDirSelector','DirectionSelector','PerpendicularDirSelector',
-    'TypeSelector','DirectionMinMaxSelector','StringSyntaxSelector','Selector','plugins'
-]
+#python is really weird with loading modules.
+#id really like to clean up this code, but alas, you cannot use
+#from <> import * from within a function, unless we get into using importlib
+user_supplied_choice = os.environ.get(CQ_BACKEND_ENV_VAR)
 
-__version__ = "0.5.2"
+try_loading_freecad=False
+try_loading_pythonocc=False
+backend_loaded = False
+
+if user_supplied_choice:
+    
+    if user_supplied_choice == CQ_Backends.PYTHONOCC:
+        log.info("PythonOCC Backend Selected")
+        try_loading_pythonocc=True
+    
+    elif user_supplied_choice == CQ_Backends.FREECAD:
+        log.info("FreeCAD Backend Selected")
+        try_loading_freecad=True
+
+    else:
+        raise NotImplementedError("Unknown Backend '%s'" % user_supplied_choice)
+else:
+    log.info("No CQ Backend Selected. Trying all Backends available")
+    try_loading_freecad=True
+    try_loading_pythonocc=True
+    
+    
+#try OCC First
+if try_loading_pythonocc and ( not backend_loaded) :
+    try:
+        #TODO: it would be nice to avoid enumerating all of the sub-modules here,
+        #but from .pythonocc_impl import * does not import the objects into the
+        #top-level cadquery namespace.
+        #i think we could use the imp tool to do what we want here and iterate 
+        #over each one
+        from .pythonocc_impl.geom import *
+        from .pythonocc_impl.operations import *
+        from .pythonocc_impl.shapes import *
+        log.warn("Found PythonOCC Backend")
+        backend_loaded = True
+       
+    except Exception as e:
+        traceback.print_exc()
+        log.warn("Exception loading PythonOCC backend",e )  
+    
+#Then FreeCAD
+if try_loading_freecad and ( not backend_loaded) :
+    try:
+        from .freecad_impl.geom import *
+        from .freecad_impl.operations import *
+        from .freecad_impl.shapes import *
+        log.warn("Found FreeCAD Backend")
+        backend_loaded = True
+    except Exception as e:
+        traceback.print_exc()
+        log.warn("Exception loading FreeCAD backend",e )          
+
+if not backend_loaded:
+    raise NotImplementedError("Cannot Load CQ: no backend available. Install OCC or FreeCAD")
+    
+from .core.geom import *
+from .core.selectors import *
+from .core.cq import *
+from .core.cqgi import *      
+
+#TODO: need to fill this out. Its a long long list!
+#tricky enough, it needs to include class names that will be defined in the backends
+core_classes=[]
+impl_classes=[]
+__all__ = core_classes + impl_classes
+        
+__version__ = "2.0.0"

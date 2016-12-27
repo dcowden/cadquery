@@ -1,0 +1,1 @@
+Tests in The core directory are executed for each backend automatically.
