@@ -1,1 +1,0 @@
-It is OK for tests to import implementations like FreeCAD directly.
