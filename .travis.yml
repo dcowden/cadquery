@@ -22,6 +22,7 @@ branches:
   except:
   - pythonocc
   - 2_0_branch
+  - new_2_0_branch
 deploy:
   provider: pypi
   user: dcowden
