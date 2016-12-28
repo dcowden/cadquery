@@ -4,17 +4,21 @@ before_install:
 - sudo apt-get update -qq
 install:
 - sudo apt-get install 
-- sudo apt-get install -y wget freecad freecad-doc
+- sudo apt-get install -y wget bzip2 freecad freecad-doc
 - sudo wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
-- sudo bash Miniconda2-latest-Linux-x86_64.sh -b
-- sudo conda install -c pythonocc -c dlr-sc pythonocc-core==0.17.1 python=2
+- sudo bash Miniconda2-latest-Linux-x86_64.sh -b -p /opt/conda
+- sudo export PATH=$PATH:/opt/conda/bin
+- sudo conda install -y -c pythonocc -c dlr-sc pythonocc-core==0.17.1 python=2
 - pip install -r requirements-dev.txt
 - python ./setup.py install
 script:
-- coverage run --source=cadquery ./runtests.sh
+#weird. we actually have two coverages-- one with each backend. not sure which to report.
+#the last one wins here.
+- CQ_BACKEND=FreeCAD && py.test -s --cov
+- CQ_BACKEND=pythonOCC && py.test -s --cov
 after_success:
 - coveralls
-- travis-sphinx deploy
+#- travis-sphinx deploy
 branches:
   except:
   - pythonocc
