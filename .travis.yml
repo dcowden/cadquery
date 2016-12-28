@@ -1,4 +1,6 @@
 language: python
+env:
+- CONDA_HOME=/opt/conda
 before_install:
 - sudo add-apt-repository -y ppa:freecad-maintainers/freecad-stable
 - sudo apt-get update -qq
@@ -6,11 +8,10 @@ install:
 - sudo apt-get install 
 - sudo apt-get install -y wget bzip2 freecad freecad-doc
 - sudo wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
-- sudo bash Miniconda2-latest-Linux-x86_64.sh -b -p /opt/conda
-- sudo export PATH=$PATH:/opt/conda/bin
-- sudo conda install -y -c pythonocc -c dlr-sc pythonocc-core==0.17.1 python=2
-- pip install -r requirements-dev.txt
-- python ./setup.py install
+- sudo bash Miniconda2-latest-Linux-x86_64.sh -b -p $CONDA_HOME
+- sudo $CONDA_HOME/bin/conda install -y -c pythonocc -c dlr-sc pythonocc-core==0.17.1 python=2
+- $CONDA_HOME/bin/pip install -r requirements-dev.txt
+- $CONDA_HOME/bin/python ./setup.py install
 script:
 #weird. we actually have two coverages-- one with each backend. not sure which to report.
 #the last one wins here.
