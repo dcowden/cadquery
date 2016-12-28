@@ -15,8 +15,8 @@ install:
 script:
 #weird. we actually have two coverages-- one with each backend. not sure which to report.
 #the last one wins here.
-- CQ_BACKEND=FreeCAD && py.test -s --cov
-- CQ_BACKEND=pythonOCC && py.test -s --cov
+- CQ_BACKEND=FreeCAD && $CONDA_HOME/bin/py.test -s --cov
+- CQ_BACKEND=pythonOCC && $CONDA_HOME/bin/py.test -s --cov
 after_success:
 - coveralls
 #- travis-sphinx deploy
