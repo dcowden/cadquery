@@ -1,12 +1,12 @@
 CadQuery 2.0
 ========================================
 
-[![Travis Build Status](https://travis-ci.org/dcowden/cadquery.svg)](https://travis-ci.org/dcowden/cadquery)
+[![Travis Build Status](https://travis-ci.org/dcowden/cadquery.svg?branch=2_0_branch)](https://travis-ci.org/dcowden/cadquery)
 [![Coverage Status](https://coveralls.io/repos/dcowden/cadquery/badge.svg)](https://coveralls.io/r/dcowden/cadquery)
 [![GitHub version](https://badge.fury.io/gh/dcowden%2Fcadquery.svg)](https://github.com/dcowden/cadquery/releases/tag/v0.3.0)
 [![License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://github.com/dcowden/cadquery/blob/master/LICENSE)
 
-This is the working version of CQ 2.0.  Not functional yet, tests do not pass!
+This is the in-process version of CQ 2.0.  Not functional yet, tests do not pass!
 
 New features in CQ 2.0
    * supports multiple backends-- FreeCAD and pythonOCC
