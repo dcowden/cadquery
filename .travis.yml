@@ -6,7 +6,7 @@ install:
 - sudo apt-get install 
 - sudo apt-get install -y wget freecad freecad-doc
 - sudo wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
-- sudo bash Miniconda2-latest-Linux-x86_64.sh
+- sudo bash Miniconda2-latest-Linux-x86_64.sh -b
 - sudo conda install -c pythonocc -c dlr-sc pythonocc-core==0.17.1 python=2
 - pip install -r requirements-dev.txt
 - python ./setup.py install
