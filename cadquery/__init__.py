@@ -49,7 +49,7 @@ backend_loaded = False
 
 
 def equals_ignore_case(string1, string2):
-    if string1 is not None an string2 is not None:
+    if string1 is not None and string2 is not None:
         return string1.lower() == string2.lower()
     if string1 is None and string2 is None:
         return True
