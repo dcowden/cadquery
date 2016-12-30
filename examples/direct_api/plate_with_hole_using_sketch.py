@@ -5,7 +5,7 @@
 	
 	
 """
-from cadquery import RectangleWire_Operation
+from cadquery import *
 
 #make a sketch
 sketch = Sketch('base',Planes.XY)

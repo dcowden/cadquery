@@ -1,47 +1,28 @@
 """
 	This is the CQ object, the fluent API portion of CQ.
-
+    Compared to CQ1.x, not nearly as much functionality is in here.
+    
+    The class acts as a facacde for the direct api, 
+    and utilizes a stack to allow convieniently operating on groups of objects
 """
 
 import time
 import math
 
 
-class CQContext(object):
-    """
-        A shared context for modeling.
-
-        All objects in the same CQ chain share a reference to this same object instance
-        which allows for shared state when needed,
-    """
-    def __init__(self):
-        self.pendingWires = []   # a list of wires that have been created and need to be extruded
-        self.pendingEdges = []   # a list of created pending edges that need to be joined into wires
-        # a reference to the first point for a set of edges.
-        # Used to determine how to behave when close() is called
-        self.firstPoint = None
-        self.tolerance = 0.0001  # user specified tolerance
-
-
 class CQ(object):
     """
-    Provides enhanced functionality for a wrapped CAD primitive.
+    Provides enhanced functionality for a CadQuery Context.
 
     Examples include feature selection, feature creation, 2d drawing
     using work planes, and 3d operations like fillets, shells, and splitting
     """
 
-    def __init__(self, obj):
-        """
-        Construct a new CadQuery (CQ) object that wraps a CAD primitive.
-
-        :param obj: Object to Wrap.
-        :type obj: A CAD Primitive ( wire,vertex,face,solid,edge )
-        """
-        self.objects = []
-        self.ctx = CQContext()
+    def __init__(self, ctx):
+        self.ctx = ctx
         self.parent = None
-
+        self.objects = [] #the cq stack
+        
         if obj:  # guarded because sometimes None for internal use
             self.objects.append(obj)
 

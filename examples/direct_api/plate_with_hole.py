@@ -11,7 +11,7 @@
 	
 	
 """
-from cadquery import RectangleWire_Operation
+from cadquery import *
 
 #make a rectangle
 rectangle = RectangleWire_Operation('rect1')

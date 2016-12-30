@@ -18,7 +18,7 @@
      Until we have a solver, we'll simply support only syntax where a direct conversion can be made
 
 """
-from cadquery import ShapeHistory
+from cadquery import ShapeLog
 
 def validate_is_tuple_2d(value,allowNone=False):
     if allowNone and value is None:
@@ -33,7 +33,7 @@ class Sketch(object):
         self.sketch_id = sketch_id
         self.plane = plane
         self.sketch_entities = {} # id, entity object
-        self.shape_history = ShapeHistory()
+        self.shape_log = ShapeLog()
         
     def add_entity(self, sketch_entity):
         self.entities[sketch_entity.id] = sketch_entity
@@ -56,7 +56,7 @@ class Sketch(object):
     
     def solved_faces(self):
         #only available after the sketch is solved. Maybe there's a better way to do this?
-        return self.shape_history.created_faces()
+        return self.shape_log.created_faces()
         
     def solve(self):
         SketchSolver.solve(self)

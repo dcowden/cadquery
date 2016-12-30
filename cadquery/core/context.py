@@ -16,31 +16,47 @@ from cadquery import ShapeType
 class Context(object):
 
     def __init__(self):
-        self.shapes =[] # a list of top-level shapes that are defined
-        self.sketches={} #key=sketchId, value=sketch object
-        self.shape_history = ShapeHistory()
-        self.id_generator= IdGenerator()
+        #in process sketches, key=sketchId, value=sketch object
+        #sketches do not generate shapes in the context until they are solved
+        self.sketches={} #
         
-    def generate_id(self):
-        return self.id_generator.generate_id()
+        #stores the history of all shapes and operations, so that we can support queries
+        self.shape_log = ShapeLog()
+        
+        #all of the operations that happened
+        self.operations = []
+        
+        #auto-generate ids when needed
+        self.id_generator= IdGenerator()
+
 
 
 class IdGenerator(object):
-    def __init__(self):
-        self.counter = 0
-        
-    def generate_id(self):
-        self.counter += 1
-        return self.counter
-
-class ShapeHistory(object):
     """
-        Stores a history of shapes and what happened to them:
+        Returns ids like 'extrude1' or 'line2'. 
+        Each prefix gets its own counter series
+    """
+    def __init__(self):
+        self.counters = {}
+        
+    def generate_id(self,prefix=""):
+        c = self.counters.setdefault(prefix,0) + 1
+        self.counters[prefix] = c
+        return "%s%d" % ( prefix, c )
+
+class ShapeLog(object):
+    """
+        Stores a history of shapes and what happened to them.
+        Also provides a current list of the active shapes. 
+        IE, shapes that have been created but not deleted
+        
+        Its kind of like a git repository for shapes.
         
         (a) which ones were created, modified, or deleted?
         (b) if available, what ID were they created or modified from? 
             -- note: sometimes the created from ID might be a shape, but sometimes
                it could be a sketchID or operation ID. thats why they are ids
+        (c) what shapes are currenly active in the context
                
         This object needs to support a query-like interface
         
@@ -49,19 +65,42 @@ class ShapeHistory(object):
     """
     def __init__(self):
         self.shapes = {} # shape id, shape
-        self.refs = [] #we may need to tune this in the future for performance, but this meets the need for now
         
-    def add_shape_reference(self,reference_type,action_type,shape):
-        self.refs.append( ReferenceEntry(id,reference_type,action_type,shape))
+        #we may need to tune this in the future for performance, but this meets the need for now
+        self.actions = [] 
+        
+    def log_shape_action(self,reference_type,action_type,shape):
+        self.actions.append( ReferenceEntry(id,reference_type,action_type,shape))
 
-    def merge_history(self, another_history):
-        # merges another history into this one
-        for ref in another_history.refs:
-            self.refs.append( ref)
+    def merge_log(self, another_log):
+        # merges another log into this one
+        for ref in another_log.actions:
+            log_shape_action(ref)
 
     def query(self, action_type=None, for_id=None, reference_type=None, shape_type=None):
-        query_results = []
-        for r in self.refs:
+        """
+            Query for objects by how they were created, what object they were created from, what type,
+            etc.
+            
+            All queries imply the condition 'objects that are still alive'.  Objects that have been removed
+            will never be returned, though the operations that created them may remain to allow other queries
+            to return results.
+            
+            Example:
+                 
+                We create a Plate using operation 'plate1', and then a cylinder, using 'cylinder-1'
+                and we subtract the cylinder from the plate in operation 'subtract1'
+                
+                Here are some queries and what they return in this case:
+                
+                all solids: the plate with the hole in it
+                all faces: the faces of the plate with the hole in it
+                faces created by 'subtract1' will be the cylindrical face in the hole of the plate
+                faces modified by 'subtract1' will be the top and bottom faces of the plate (since they were modified during the cut)
+                
+        """
+        query_results = {}
+        for r in self.actions:
             matches = True
             if action_type is not None and r.action_type != action_type :
                 matches = False
@@ -72,27 +111,18 @@ class ShapeHistory(object):
             if shape_class is not None and r.shape.shape_type != shape_type :
                 matches = False             
             if matches:
-                query_results.append(r)
+                query_results[r.shape.id] = r
                 
-        return query_results
+        return query_results.values()
     
-    def all_shapes(self):
-        s = set()
-        for r in self.refs:
-            s.add(r.shape)
-        return s
-    
-    def created_faces(self):
-        return self.query(action_type=ActionType.CREATED,shape_type=ShapeType.FACE)
+    def all(self):
+        return self.query()
         
-    def created_shapes(self):   
-        return self.query(action_type=ActionType.CREATED)
+    def all_solids(self):
+        return self.query(shape_type=ShapeType.SOLID)
         
-    def modified_shapes(self):
-        return self.query(action_type=ActionType.MODIFIED)
-        
-    def deleted_shapes(self):
-        return self.query(action_type=ActionType.DELETED)
+    def all_faces(self):
+        return self.query(shape_type=ShapeType.FACE)
         
     def created_by_id(self,id):
         return self.query(action_type=ActionType.CREATED,for_id=id)

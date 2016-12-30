@@ -18,6 +18,7 @@ class BaseUnion_Operation(BaseOperation): pass
 class BaseIntersect_Operation(BaseOperation): pass
 class BaseCut_Operation(BaseOperation): pass
 class BaseChamfer_Operation(BaseOperation): pass
+class BaseSplitOperation(BaseOperation):pass
 class BaseFillet_Operation(BaseOperation): pass
 
 #Transformations

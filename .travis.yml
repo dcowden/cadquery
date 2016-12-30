@@ -14,20 +14,10 @@ install:
 - sudo $CONDA_HOME/bin/pip install -r requirements-dev.txt
 - sudo $CONDA_HOME/bin/python ./setup.py install
 script:
-#weird. we actually have two coverages-- one with each backend. not sure which to report.
-#the last one wins here.
-- CQ_BACKEND=FreeCAD && $CONDA_HOME/bin/py.test -s --cov
-- CQ_BACKEND=pythonOCC && $CONDA_HOME/bin/py.test -s --cov
+- runtests.sh
 after_success:
 - coveralls
 #- travis-sphinx deploy
 branches:
   except:
   - pythonocc
-#deploy:
-#  provider: pypi
-#  user: dcowden
-#  password:
-#    secure: aP02wBbry1j3hYG/w++siF1lk26teuRQlPAx1c+ec8fxUw+bECa2HbPQHcIvSXB5N6nc6P3L9LjHt9ktm+Dn6FLJu3qWYNGAZx9PTn24ug0iAmB+JyNrsET3nK6WUKR1XpBqvjKgdpukd1Hknh2FSzYoyUvFWH9/CovITCFN3jo=
-#  on:
-#    tags: true
