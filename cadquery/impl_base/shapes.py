@@ -2,6 +2,9 @@ from cadquery import Shape
 
 class BaseCompound(Shape):
 
+    def __init__(self):
+        self.shape_type=ShapeType.COMPOUND
+        
     def volume(self):
         raise NotImplementedError("Implement this Shape Method")
         
@@ -28,6 +31,9 @@ class BaseCompound(Shape):
         
 class BaseSolid(Shape):
 
+    def __init__(self):
+        self.shape_type=ShapeType.SOLID
+
     def volume(self):
         raise NotImplementedError("Implement this Shape Method")
         
@@ -51,6 +57,9 @@ class BaseSolid(Shape):
 
 class BaseShell(Shape):
 
+    def __init__(self):
+        self.shape_type=ShapeType.SHELL
+        
     def volume(self):
         raise NotImplementedError("Implement this Shape Method")
         
@@ -75,6 +84,8 @@ class BaseShell(Shape):
         
 class BaseFace(Shape):
 
+    def __init__(self):
+        self.shape_type=ShapeType.FACE
         
     def area(self):
         raise NotImplementedError("Implement this Shape Method")    
@@ -92,6 +103,8 @@ class BaseFace(Shape):
         
 class BaseWire(Shape):
 
+    def __init__(self):
+        self.shape_type=ShapeType.WIRE
         
     def length(self):
         raise NotImplementedError("Implement this Shape Method")    
@@ -107,6 +120,9 @@ class BaseWire(Shape):
     
 class BaseEdge(Shape):
 
+    def __init__(self):
+        self.shape_type=ShapeType.EDGE
+        
     def length(self):
         raise NotImplementedError("Implement this Shape Method")    
     
@@ -118,4 +134,6 @@ class BaseEdge(Shape):
 
     
 class BaseVertex(Shape):
+    def __init__(self):
+        self.shape_type=ShapeType.VERTEX
     pass

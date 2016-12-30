@@ -30,9 +30,10 @@ log = logging.getLogger("cq_init")
 # we need to get the base classes that the backend implementation needs,
 # then we need to import the rest
 from .core.config import *
+from .core.shapes import *
 from .core.context import *
 from .core.operations import *
-from .core.shapes import *
+from .core.sketch import *
 from .core.exporter import *
 from .core.importer import *
 
@@ -46,13 +47,22 @@ try_loading_freecad=False
 try_loading_pythonocc=False
 backend_loaded = False
 
+
+def equals_ignore_case(string1, string2):
+    if string1 is not None an string2 is not None:
+        return string1.lower() == string2.lower()
+    if string1 is None and string2 is None:
+        return True
+    else:
+        return False
+        
 if user_supplied_choice:
     
-    if user_supplied_choice == CQ_Backends.PYTHONOCC:
+    if equals_ignore_case(user_supplied_choice ,CQ_Backends.PYTHONOCC):
         log.info("PythonOCC Backend Selected")
         try_loading_pythonocc=True
     
-    elif user_supplied_choice == CQ_Backends.FREECAD:
+    elif equals_ignore_case(user_supplied_choice, CQ_Backends.FREECAD):
         log.info("FreeCAD Backend Selected")
         try_loading_freecad=True
 

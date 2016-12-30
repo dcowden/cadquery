@@ -30,6 +30,7 @@ class BaseFaceIntersect_Operation(BaseOperation):pass
 class BaseFaceFromPlane_Operation(BaseOperation):pass
 class BaseFuseFace_Operation(BaseOperation):pass
 class BaseRuledSurface_Operation(BaseOperation):pass
+class BaseFaceFromWires_Operation(BaseOperation):pass
 
 #Edge Operations
 class BaseCircleEdge_Operation(BaseOperation): pass
@@ -45,7 +46,11 @@ class BaseRegularPolygonWire_Operation(BaseOperation):pass
 class BaseHelix_Operation(BaseOperation):pass
 class BaseCombineWires_Operation(BaseOperation):pass
 class BaseCombineEdges_Operation(BaseOperation):pass
- 
+class BaseRectangleWire_Operation(BaseOperation):pass
+
 #Shell Operations
 class BaseShellFromFaces_Operation(BaseOperation): pass
 class BaseShellSolid_Operation(BaseOperation): pass
+
+#Projection Operations
+class BaseProjectOntoPlane_Operation(BaseOperation): pass

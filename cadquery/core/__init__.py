@@ -1,1 +1,1 @@
-__all__ = ["context","cq","cqgi","exporters","geom","operations","selectors","shapes","importers"]
+__all__ = ["context","sketch","cq","cqgi","exporters","geom","operations","selectors","shapes","importers"]

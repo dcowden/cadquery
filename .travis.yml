@@ -1,4 +1,5 @@
 language: python
+# it would really be nice to be able to change the path, but in travis i cant figure out how to do it
 env:
 - CONDA_HOME=/opt/conda
 before_install:

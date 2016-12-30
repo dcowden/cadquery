@@ -16,9 +16,9 @@
 """
 
 class Shape(object):
-    def __init(self,id, wrapped):
+    def __init(self,id):
         self.id = id
-        self.wrapped = wrapped
+        self.shape_type = None
         
     def __hash__(self):
         return self.id
@@ -32,5 +32,12 @@ class Shape(object):
     def __eq__(self, other):
         return self.id == other.id 
 
-
+class ShapeType(object):
+    FACE="FACE"
+    EDGE="EDGE"
+    WIRE="WIRE"
+    SOLID="SOLID"
+    COMPOUND="COMPOUND"
+    VERTEX="VERTEX"
+    SHELL="SHELL"
     
