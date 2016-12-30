@@ -14,7 +14,7 @@ install:
 - sudo $CONDA_HOME/bin/pip install -r requirements-dev.txt
 - sudo $CONDA_HOME/bin/python ./setup.py install
 script:
-- ./runtests.sh
+- sh runtests.sh
 after_success:
 - coveralls
 #- travis-sphinx deploy
