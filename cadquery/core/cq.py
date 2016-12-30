@@ -8,7 +8,7 @@
 
 import time
 import math
-
+from cadquery import Context, Sketch
 
 class CQ(object):
     """
@@ -18,15 +18,15 @@ class CQ(object):
     using work planes, and 3d operations like fillets, shells, and splitting
     """
 
-    def __init__(self, ctx):
+    def __init__(self, ctx=None):
+    
+        if not ctx:
+            ctx = Context()
         self.ctx = ctx
         self.parent = None
         self.objects = [] #the cq stack
-        
-        if obj:  # guarded because sometimes None for internal use
-            self.objects.append(obj)
 
-    def newObject(self, objlist):
+    def newObject(self, ctx, objlist):
         """
         Make a new CQ object.
 
@@ -39,9 +39,8 @@ class CQ(object):
         Custom plugins and subclasses should use this method to create new CQ objects
         correctly.
         """
-        r = CQ(None)  # create a completely blank one
+        r = CQ(ctx)  # create a completely blank one
         r.parent = self
-        r.ctx = self.ctx  # context solid remains the same
         r.objects = list(objlist)
         return r
 
@@ -212,19 +211,522 @@ class CQ(object):
         Return the first value on the stack
 
         :return: the first value on the stack.
-        :rtype: A FreeCAD object or a SolidReference
+        :rtype: A SHape
         """
         return self.objects[0]
 
-    def toFreecad(self):
+    def cutEach(self, fcn, useLocalCoords=False, clean=True):
         """
-        Directly returns the wrapped FreeCAD object to cut down on the amount of boiler plate code
-        needed when rendering a model in FreeCAD's 3D view.
-        :return: The wrapped FreeCAD object
-        :rtype A FreeCAD object or a SolidReference
+        Evaluates the provided function at each point on the stack (ie, eachpoint)
+        and then cuts the result from the context solid.
+        :param fcn: a function suitable for use in the eachpoint method: ie, that accepts a vector
+        :param useLocalCoords: same as for :py:meth:`eachpoint`
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :return: a CQ object that contains the resulting solid
+        :raises: an error if there is not a context solid to cut from
+        """     
+        ctxSolid = self.findSolid()
+        if ctxSolid is None:
+            raise ValueError("Must have a solid in the chain to cut from!")
+
+        #will contain all of the counterbores as a single compound
+        results = self.eachpoint(fcn, useLocalCoords).vals()
+        s = ctxSolid
+        for cb in results:
+            s = s.cut(cb)
+
+        if clean: s = s.clean()
+
+        ctxSolid.wrapped = s.wrapped
+        return self.newObject([s])
+
+    #but parameter list is different so a simple function pointer wont work
+    def cboreHole(self, diameter, cboreDiameter, cboreDepth, depth=None, clean=True):
+        """
+        Makes a counterbored hole for each item on the stack.
+
+        :param diameter: the diameter of the hole
+        :type diameter: float > 0
+        :param cboreDiameter: the diameter of the cbore
+        :type cboreDiameter: float > 0 and > diameter
+        :param cboreDepth: depth of the counterbore
+        :type cboreDepth: float > 0
+        :param depth: the depth of the hole
+        :type depth: float > 0 or None to drill thru the entire part.
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+
+        The surface of the hole is at the current workplane plane.
+
+        One hole is created for each item on the stack.  A very common use case is to use a
+        construction rectangle to define the centers of a set of holes, like so::
+
+                s = Workplane(Plane.XY()).box(2,4,0.5).faces(">Z").workplane()\
+                    .rect(1.5,3.5,forConstruction=True)\
+                    .vertices().cboreHole(0.125, 0.25,0.125,depth=None)
+
+        This sample creates a plate with a set of holes at the corners.
+
+        **Plugin Note**: this is one example of the power of plugins. Counterbored holes are quite
+        time consuming to create, but are quite easily defined by users.
+
+        see :py:meth:`cskHole` to make countersinks instead of counterbores
+        """
+        if depth is None:
+            depth = self.largestDimension()
+
+        def _makeCbore(center):
+            """
+            Makes a single hole with counterbore at the supplied point
+            returns a solid suitable for subtraction
+            pnt is in local coordinates
+            """
+            boreDir = Vector(0, 0, -1)
+            #first make the hole
+            hole = Solid.makeCylinder(diameter/2.0, depth, center, boreDir)  # local coordianates!
+
+            #add the counter bore
+            cbore = Solid.makeCylinder(cboreDiameter / 2.0, cboreDepth, center, boreDir)
+            r = hole.fuse(cbore)
+            return r
+
+        return self.cutEach(_makeCbore, True, clean)
+
+    #TODO: almost all code duplicated!
+    #but parameter list is different so a simple function pointer wont work
+    def cskHole(self, diameter, cskDiameter, cskAngle, depth=None, clean=True):
+        """
+        Makes a countersunk hole for each item on the stack.
+
+        :param diameter: the diameter of the hole
+        :type diameter: float > 0
+        :param cskDiameter: the diameter of the countersink
+        :type cskDiameter: float > 0 and > diameter
+        :param cskAngle: angle of the countersink, in degrees ( 82 is common )
+        :type cskAngle: float > 0
+        :param depth: the depth of the hole
+        :type depth: float > 0 or None to drill thru the entire part.
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+
+        The surface of the hole is at the current workplane.
+
+        One hole is created for each item on the stack.  A very common use case is to use a
+        construction rectangle to define the centers of a set of holes, like so::
+
+                s = Workplane(Plane.XY()).box(2,4,0.5).faces(">Z").workplane()\
+                    .rect(1.5,3.5,forConstruction=True)\
+                    .vertices().cskHole(0.125, 0.25,82,depth=None)
+
+        This sample creates a plate with a set of holes at the corners.
+
+        **Plugin Note**: this is one example of the power of plugins. CounterSunk holes are quite
+        time consuming to create, but are quite easily defined by users.
+
+        see :py:meth:`cboreHole` to make counterbores instead of countersinks
         """
 
-        return self.objects[0].wrapped
+        if depth is None:
+            depth = self.largestDimension()
+
+        def _makeCsk(center):
+            #center is in local coordinates
+
+            boreDir = Vector(0, 0, -1)
+
+            #first make the hole
+            hole = Solid.makeCylinder(diameter/2.0, depth, center, boreDir)  # local coords!
+            r = cskDiameter / 2.0
+            h = r / math.tan(math.radians(cskAngle / 2.0))
+            csk = Solid.makeCone(r, 0.0, h, center, boreDir)
+            r = hole.fuse(csk)
+            return r
+
+        return self.cutEach(_makeCsk, True, clean)
+
+    #TODO: almost all code duplicated!
+    #but parameter list is different so a simple function pointer wont work
+    def hole(self, diameter, depth=None, clean=True):
+        """
+        Makes a hole for each item on the stack.
+
+        :param diameter: the diameter of the hole
+        :type diameter: float > 0
+        :param depth: the depth of the hole
+        :type depth: float > 0 or None to drill thru the entire part.
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+
+        The surface of the hole is at the current workplane.
+
+        One hole is created for each item on the stack.  A very common use case is to use a
+        construction rectangle to define the centers of a set of holes, like so::
+
+                s = Workplane(Plane.XY()).box(2,4,0.5).faces(">Z").workplane()\
+                    .rect(1.5,3.5,forConstruction=True)\
+                    .vertices().hole(0.125, 0.25,82,depth=None)
+
+        This sample creates a plate with a set of holes at the corners.
+
+        **Plugin Note**: this is one example of the power of plugins. CounterSunk holes are quite
+        time consuming to create, but are quite easily defined by users.
+
+        see :py:meth:`cboreHole` and :py:meth:`cskHole` to make counterbores or countersinks
+        """
+        if depth is None:
+            depth = self.largestDimension()
+
+        def _makeHole(center):
+            """
+            Makes a single hole with counterbore at the supplied point
+            returns a solid suitable for subtraction
+            pnt is in local coordinates
+            """
+            boreDir = Vector(0, 0, -1)
+            #first make the hole
+            hole = Solid.makeCylinder(diameter / 2.0, depth, center, boreDir)  # local coordinates!
+            return hole
+
+        return self.cutEach(_makeHole, True, clean)
+
+    #TODO: duplicated code with _extrude and extrude
+    def twistExtrude(self, distance, angleDegrees, combine=True, clean=True):
+        """
+        Extrudes a wire in the direction normal to the plane, but also twists by the specified
+        angle over the length of the extrusion
+
+        The center point of the rotation will be the center of the workplane
+
+        See extrude for more details, since this method is the same except for the the addition
+        of the angle. In fact, if angle=0, the result is the same as a linear extrude.
+
+        **NOTE**  This method can create complex calculations, so be careful using it with
+        complex geometries
+
+        :param distance: the distance to extrude normal to the workplane
+        :param angle: angline ( in degrees) to rotate through the extrusion
+        :param boolean combine: True to combine the resulting solid with parent solids if found.
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :return: a CQ object with the resulting solid selected.
+        """
+        #group wires together into faces based on which ones are inside the others
+        #result is a list of lists
+        wireSets = sortWiresByBuildOrder(list(self.ctx.pendingWires), self.plane, [])
+
+        self.ctx.pendingWires = []  # now all of the wires have been used to create an extrusion
+
+        #compute extrusion vector and extrude
+        eDir = self.plane.zDir.multiply(distance)
+
+        #one would think that fusing faces into a compound and then extruding would work,
+        #but it doesnt-- the resulting compound appears to look right, ( right number of faces, etc)
+        #but then cutting it from the main solid fails with BRep_NotDone.
+        #the work around is to extrude each and then join the resulting solids, which seems to work
+
+        #underlying cad kernel can only handle simple bosses-- we'll aggregate them if there
+        # are multiple sets
+        r = None
+        for ws in wireSets:
+            thisObj = Solid.extrudeLinearWithRotation(ws[0], ws[1:], self.plane.origin,
+                                                      eDir, angleDegrees)
+            if r is None:
+                r = thisObj
+            else:
+                r = r.fuse(thisObj)
+
+        if combine:
+            newS = self._combineWithBase(r)
+        else:
+            newS = self.newObject([r])
+        if clean: newS = newS.clean()
+        return newS
+
+    def extrude(self, distance, combine=True, clean=True, both=False):
+        """
+        Use all un-extruded wires in the parent chain to create a prismatic solid.
+
+        :param distance: the distance to extrude, normal to the workplane plane
+        :type distance: float, negative means opposite the normal direction
+        :param boolean combine: True to combine the resulting solid with parent solids if found.
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :param boolean both: extrude in both directions symmetrically
+        :return: a CQ object with the resulting solid selected.
+
+        extrude always *adds* material to a part.
+
+        The returned object is always a CQ object, and depends on wither combine is True, and
+        whether a context solid is already defined:
+
+        *  if combine is False, the new value is pushed onto the stack.
+        *  if combine is true, the value is combined with the context solid if it exists,
+           and the resulting solid becomes the new context solid.
+
+        FutureEnhancement:
+            Support for non-prismatic extrusion ( IE, sweeping along a profile, not just
+            perpendicular to the plane extrude to surface. this is quite tricky since the surface
+            selected may not be planar
+        """               
+        r = self._extrude(distance,both=both)  # returns a Solid (or a compound if there were multiple)
+            
+        if combine:
+            newS = self._combineWithBase(r)
+        else:
+            newS = self.newObject([r])
+        if clean: newS = newS.clean()
+        return newS
+
+    def revolve(self, angleDegrees=360.0, axisStart=None, axisEnd=None, combine=True, clean=True):
+        """
+        Use all un-revolved wires in the parent chain to create a solid.
+
+        :param angleDegrees: the angle to revolve through.
+        :type angleDegrees: float, anything less than 360 degrees will leave the shape open
+        :param axisStart: the start point of the axis of rotation
+        :type axisStart: tuple, a two tuple
+        :param axisEnd: the end point of the axis of rotation
+        :type axisEnd: tuple, a two tuple
+        :param combine: True to combine the resulting solid with parent solids if found.
+        :type combine: boolean, combine with parent solid
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :return: a CQ object with the resulting solid selected.
+
+        The returned object is always a CQ object, and depends on wither combine is True, and
+        whether a context solid is already defined:
+
+        *  if combine is False, the new value is pushed onto the stack.
+        *  if combine is true, the value is combined with the context solid if it exists,
+           and the resulting solid becomes the new context solid.
+        """
+        #Make sure we account for users specifying angles larger than 360 degrees
+        angleDegrees %= 360.0
+
+        #Compensate for FreeCAD not assuming that a 0 degree revolve means a 360 degree revolve
+        angleDegrees = 360.0 if angleDegrees == 0 else angleDegrees
+
+        # The default start point of the vector defining the axis of rotation will be the origin
+        # of the workplane
+        if axisStart is None:
+            axisStart = self.plane.toWorldCoords((0, 0)).toTuple()
+        else:
+            axisStart = self.plane.toWorldCoords(axisStart).toTuple()
+
+        # The default end point of the vector defining the axis of rotation should be along the
+        # normal from the plane
+        if axisEnd is None:
+            # Make sure we match the user's assumed axis of rotation if they specified an start
+            # but not an end
+            if axisStart[1] != 0:
+                axisEnd = self.plane.toWorldCoords((0, axisStart[1])).toTuple()
+            else:
+                axisEnd = self.plane.toWorldCoords((0, 1)).toTuple()
+        else:
+            axisEnd = self.plane.toWorldCoords(axisEnd).toTuple()
+
+        # returns a Solid (or a compound if there were multiple)
+        r = self._revolve(angleDegrees, axisStart, axisEnd)
+        if combine:
+            newS = self._combineWithBase(r)
+        else:
+            newS = self.newObject([r])
+        if clean: newS = newS.clean()
+        return newS
+
+    def sweep(self, path, makeSolid=True, isFrenet=False, combine=True, clean=True):
+        """
+        Use all un-extruded wires in the parent chain to create a swept solid.
+
+        :param path: A wire along which the pending wires will be swept
+        :param boolean combine: True to combine the resulting solid with parent solids if found.
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :return: a CQ object with the resulting solid selected.
+        """
+
+        r = self._sweep(path.wire(), makeSolid, isFrenet)  # returns a Solid (or a compound if there were multiple)
+        if combine:
+            newS = self._combineWithBase(r)
+        else:
+            newS = self.newObject([r])
+        if clean: newS = newS.clean()
+        return newS
+
+    def _combineWithBase(self, obj):
+        """
+        Combines the provided object with the base solid, if one can be found.
+        :param obj:
+        :return: a new object that represents the result of combining the base object with obj,
+           or obj if one could not be found
+        """
+        baseSolid = self.findSolid(searchParents=True)
+        r = obj
+        if baseSolid is not None:
+            r = baseSolid.fuse(obj)
+            baseSolid.wrapped = r.wrapped
+
+        return self.newObject([r])
+
+    def combine(self, clean=True):
+        """
+        Attempts to combine all of the items on the stack into a single item.
+        WARNING: all of the items must be of the same type!
+
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :raises: ValueError if there are no items on the stack, or if they cannot be combined
+        :return: a CQ object with the resulting object selected
+        """
+        items = list(self.objects)
+        s = items.pop(0)
+        for ss in items:
+            s = s.fuse(ss)
+
+        if clean: s = s.clean()
+
+        return self.newObject([s])
+
+    def union(self, toUnion=None, combine=True, clean=True):
+        """
+        Unions all of the items on the stack of toUnion with the current solid.
+        If there is no current solid, the items in toUnion are unioned together.
+        if combine=True, the result and the original are updated to point to the new object
+        if combine=False, the result will be on the stack, but the original is unmodified
+
+        :param toUnion:
+        :type toUnion: a solid object, or a CQ object having a solid,
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :raises: ValueError if there is no solid to add to in the chain
+        :return: a CQ object with the resulting object selected
+        """
+
+        #first collect all of the items together
+        if type(toUnion) == CQ or type(toUnion) == Workplane:
+            solids = toUnion.solids().vals()
+            if len(solids) < 1:
+                raise ValueError("CQ object  must have at least one solid on the stack to union!")
+            newS = solids.pop(0)
+            for s in solids:
+                newS = newS.fuse(s)
+        elif type(toUnion) == Solid:
+            newS = toUnion
+        else:
+            raise ValueError("Cannot union type '{}'".format(type(toUnion)))
+
+        #now combine with existing solid, if there is one
+        # look for parents to cut from
+        solidRef = self.findSolid(searchStack=True, searchParents=True)
+        if combine and solidRef is not None:
+            r = solidRef.fuse(newS)
+            solidRef.wrapped = newS.wrapped
+        else:
+            r = newS
+
+        if clean: r = r.clean()
+
+        return self.newObject([r])
+
+    def cut(self, toCut, combine=True, clean=True):
+        """
+        Cuts the provided solid from the current solid, IE, perform a solid subtraction
+
+        if combine=True, the result and the original are updated to point to the new object
+        if combine=False, the result will be on the stack, but the original is unmodified
+
+        :param toCut: object to cut
+        :type toCut: a solid object, or a CQ object having a solid,
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :raises: ValueError if there is no solid to subtract from in the chain
+        :return: a CQ object with the resulting object selected
+        """
+
+        # look for parents to cut from
+        solidRef = self.findSolid(searchStack=True, searchParents=True)
+
+        if solidRef is None:
+            raise ValueError("Cannot find solid to cut from")
+        solidToCut = None
+        if type(toCut) == CQ or type(toCut) == Workplane:
+            solidToCut = toCut.val()
+        elif type(toCut) == Solid:
+            solidToCut = toCut
+        else:
+            raise ValueError("Cannot cut type '{}'".format(type(toCut)))
+
+        newS = solidRef.cut(solidToCut)
+
+        if clean: newS = newS.clean()
+
+        if combine:
+            solidRef.wrapped = newS.wrapped
+
+        return self.newObject([newS])
+
+    def cutBlind(self, distanceToCut, clean=True):
+        """
+        Use all un-extruded wires in the parent chain to create a prismatic cut from existing solid.
+
+        Similar to extrude, except that a solid in the parent chain is required to remove material
+        from. cutBlind always removes material from a part.
+
+        :param distanceToCut: distance to extrude before cutting
+        :type distanceToCut: float, >0 means in the positive direction of the workplane normal,
+            <0 means in the negative direction
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :raises: ValueError if there is no solid to subtract from in the chain
+        :return: a CQ object with the resulting object selected
+
+        see :py:meth:`cutThruAll` to cut material from the entire part
+
+        Future Enhancements:
+            Cut Up to Surface
+        """
+        #first, make the object
+        toCut = self._extrude(distanceToCut)
+
+        #now find a solid in the chain
+
+        solidRef = self.findSolid()
+
+        s = solidRef.cut(toCut)
+
+        if clean: s = s.clean()
+
+        solidRef.wrapped = s.wrapped
+        return self.newObject([s])
+
+    def cutThruAll(self, positive=False, clean=True):
+        """
+        Use all un-extruded wires in the parent chain to create a prismatic cut from existing solid.
+
+        Similar to extrude, except that a solid in the parent chain is required to remove material
+        from. cutThruAll always removes material from a part.
+
+        :param boolean positive: True to cut in the positive direction, false to cut in the
+            negative direction
+        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
+        :raises: ValueError if there is no solid to subtract from in the chain
+        :return: a CQ object with the resulting object selected
+
+        see :py:meth:`cutBlind` to cut material to a limited depth
+        """
+        maxDim = self.largestDimension()
+        if not positive:
+            maxDim *= (-1.0)
+
+        return self.cutBlind(maxDim, clean)
+
+    def loft(self, filled=True, ruled=False, combine=True):
+        """
+        Make a lofted solid, through the set of wires.
+        :return: a CQ object containing the created loft
+        """
+        wiresToLoft = self.ctx.pendingWires
+        self.ctx.pendingWires = []
+
+        r = Solid.makeLoft(wiresToLoft, ruled)
+
+        if combine:
+            parentSolid = self.findSolid(searchStack=False, searchParents=True)
+            if parentSolid is not None:
+                r = parentSolid.fuse(r)
+                parentSolid.wrapped = r.wrapped
+
+        return self.newObject([r])        
+
 
     def workplane(self, offset=0.0, invert=False, centerOption='CenterOfMass'):
         """
@@ -848,34 +1350,7 @@ class CQ(object):
 
 
 class Workplane(CQ):
-    """
-    Defines a coordinate system in space, in which 2-d coordinates can be used.
-
-    :param plane: the plane in which the workplane will be done
-    :type plane: a Plane object, or a string in (XY|YZ|XZ|front|back|top|bottom|left|right)
-    :param origin: the desired origin of the new workplane
-    :type origin: a 3-tuple in global coordinates, or None to default to the origin
-    :param obj: an object to use initially for the stack
-    :type obj: a CAD primitive, or None to use the centerpoint of the plane as the initial
-        stack value.
-    :raises: ValueError if the provided plane is not a plane, a valid named workplane
-    :return: A Workplane object, with coordinate system matching the supplied plane.
-
-    The most common use is::
-
-        s = Workplane("XY")
-
-    After creation, the stack contains a single point, the origin of the underlying plane,
-    and the *current point* is on the origin.
-
-    .. note::
-        You can also create workplanes on the surface of existing faces using
-        :py:meth:`CQ.workplane`
-    """
-
-    FOR_CONSTRUCTION = 'ForConstruction'
-
-    def __init__(self, inPlane, origin=(0, 0, 0), obj=None):
+    def __init__(self, inPlane, origin=(0, 0, 0), ctx=None,sketch_id=None):
         """
         make a workplane from a particular plane
 
@@ -896,7 +1371,8 @@ class Workplane(CQ):
         After creation, the stack contains a single point, the origin of the underlying plane, and
         the *current point* is on the origin.
         """
-
+        CQ.__init__(self,ctx=ctx)
+        
         if inPlane.__class__.__name__ == 'Plane':
             tmpPlane = inPlane
         elif isinstance(inPlane, str) or isinstance(inPlane, unicode):
@@ -908,59 +1384,10 @@ class Workplane(CQ):
             raise ValueError(
                 'Provided value {} is not a valid work plane'.format(inPlane))
 
-        self.obj = obj
-        self.plane = tmpPlane
-        self.firstPoint = None
-        # Changed so that workplane has the center as the first item on the stack
-        self.objects = [self.plane.origin]
-        self.parent = None
-        self.ctx = CQContext()
-
-    def transformed(self, rotate=(0, 0, 0), offset=(0, 0, 0)):
-        """
-        Create a new workplane based on the current one.
-        The origin of the new plane is located at the existing origin+offset vector, where offset is
-        given in coordinates local to the current plane
-        The new plane is rotated through the angles specified by the components of the rotation
-        vector.
-        :param rotate: 3-tuple of angles to rotate, in degrees relative to work plane coordinates
-        :param offset: 3-tuple to offset the new plane, in local work plane coordinates
-        :return: a new work plane, transformed as requested
-        """
-
-        #old api accepted a vector, so we'll check for that.
-        if rotate.__class__.__name__ == 'Vector':
-            rotate = rotate.toTuple()
-
-        if offset.__class__.__name__ == 'Vector':
-            offset = offset.toTuple()
-
-        p = self.plane.rotated(rotate)
-        p.origin = self.plane.toWorldCoords(offset)
-        ns = self.newObject([p.origin])
-        ns.plane = p
-
-        return ns
-
-    def newObject(self, objlist):
-        """
-        Create a new workplane object from this one.
-
-        Overrides CQ.newObject, and should be used by extensions, plugins, and
-        subclasses to create new objects.
-
-        :param objlist: new objects to put on the stack
-        :type objlist: a list of CAD primitives
-        :return: a new Workplane object with the current workplane as a parent.
-        """
-
-        #copy the current state to the new object
-        ns = Workplane("XY")
-        ns.plane = self.plane
-        ns.parent = self
-        ns.objects = list(objlist)
-        ns.ctx = self.ctx
-        return ns
+        if not sketch_id:
+            sketch_id = self.ctx.id_generator.generate_id("sketch")
+        self.sketch = Sketch(sketch_id,tmpPlane)
+        
 
     def _findFromPoint(self, useLocalCoords=False):
         """
@@ -997,65 +1424,6 @@ class Workplane(CQ):
         else:
             return p
 
-    def rarray(self, xSpacing, ySpacing, xCount, yCount, center=True):
-        """
-        Creates an array of points and pushes them onto the stack.
-        If you want to position the array at another point, create another workplane
-        that is shifted to the position you would like to use as a reference
-
-        :param xSpacing: spacing between points in the x direction ( must be > 0)
-        :param ySpacing: spacing between points in the y direction ( must be > 0)
-        :param xCount: number of points ( > 0 )
-        :param yCount: number of points ( > 0 )
-        :param center: if true, the array will be centered at the center of the workplane. if
-            false, the lower left corner will be at the center of the work plane
-        """
-
-        if xSpacing < 1 or ySpacing < 1 or xCount < 1 or yCount < 1:
-            raise ValueError("Spacing and count must be > 0 ")
-
-        lpoints = []  # coordinates relative to bottom left point
-        for x in range(xCount):
-            for y in range(yCount):
-                lpoints.append((xSpacing * x, ySpacing * y))
-
-        #shift points down and left relative to origin if requested
-        if center:
-            xc = xSpacing*(xCount-1) * 0.5
-            yc = ySpacing*(yCount-1) * 0.5
-            cpoints = []
-            for p in lpoints:
-                cpoints.append((p[0] - xc, p[1] - yc))
-            lpoints = list(cpoints)
-
-        return self.pushPoints(lpoints)
-
-    def pushPoints(self, pntList):
-        """
-        Pushes a list of points onto the stack as vertices.
-        The points are in the 2-d coordinate space of the workplane face
-
-        :param pntList: a list of points to push onto the stack
-        :type pntList: list of 2-tuples, in *local* coordinates
-        :return: a new workplane with the desired points on the stack.
-
-        A common use is to provide a list of points for a subsequent operation, such as creating
-        circles or holes. This example creates a cube, and then drills three holes through it,
-        based on three points::
-
-            s = Workplane().box(1,1,1).faces(">Z").workplane().\
-                pushPoints([(-0.3,0.3),(0.3,0.3),(0,0)])
-            body = s.circle(0.05).cutThruAll()
-
-        Here the circle function operates on all three points, and is then extruded to create three
-        holes. See :py:meth:`circle` for how it works.
-        """
-        vecs = []
-        for pnt in pntList:
-            vec = self.plane.toWorldCoords(pnt)
-            vecs.append(vec)
-
-        return self.newObject(vecs)
 
     def center(self, x, y):
         """
@@ -1367,91 +1735,6 @@ class Workplane(CQ):
         if self.ctx.firstPoint is None:
             self.ctx.firstPoint = self.plane.toLocalCoords(edge.startPoint())
 
-    def _addPendingWire(self, wire):
-        """
-        Queue a Wire for later extrusion
-
-        Internal Processing Note.  In FreeCAD, edges-->wires-->faces-->solids.
-
-        but users do not normally care about these distinctions.  Users 'think' in terms
-        of edges, and solids.
-
-        CadQuery tracks edges as they are drawn, and automatically combines them into wires
-        when the user does an operation that needs it.
-
-        Similarly, cadQuery tracks pending wires, and automatically combines them into faces
-        when necessary to make a solid.
-        """
-        self.ctx.pendingWires.append(wire)
-
-    def consolidateWires(self):
-        """
-        Attempt to consolidate wires on the stack into a single.
-        If possible, a new object with the results are returned.
-        if not possible, the wires remain separated
-
-        FreeCAD has a bug in Part.Wire([]) which does not create wires/edges properly sometimes
-        Additionally, it has a bug where a profile composed of two wires ( rather than one )
-        also does not work properly. Together these are a real problem.
-        """
-        wires = self.wires().vals()
-        if len(wires) < 2:
-            return self
-
-        #TODO: this makes the assumption that either all wires could be combined, or none.
-        #in reality trying each combination of wires is probably not reasonable anyway
-        w = Wire.combine(wires)
-
-        #ok this is a little tricky. if we consolidate wires, we have to actually
-        #modify the pendingWires collection to remove the original ones, and replace them
-        #with the consolidate done
-        #since we are already assuming that all wires could be consolidated, its easy, we just
-        #clear the pending wire list
-        r = self.newObject([w])
-        r.ctx.pendingWires = []
-        r._addPendingWire(w)
-        return r
-
-    def wire(self, forConstruction=False):
-        """
-        Returns a CQ object with all pending edges connected into a wire.
-
-        All edges on the stack that can be combined will be combined into a single wire object,
-        and other objects will remain on the stack unmodified
-
-        :param forConstruction: whether the wire should be used to make a solid, or if it is just
-            for reference
-        :type forConstruction: boolean. true if the object is only for reference
-
-        This method is primarily of use to plugin developers making utilities for 2-d construction.
-        This method should be called when a user operation implies that 2-d construction is
-        finished, and we are ready to begin working in 3d
-
-        SEE '2-d construction concepts' for a more detailed explanation of how CadQuery handles
-        edges, wires, etc
-
-        Any non edges will still remain.
-        """
-
-        edges = self.ctx.pendingEdges
-
-        #do not consolidate if there are no free edges
-        if len(edges) == 0:
-            return self
-
-        self.ctx.pendingEdges = []
-
-        others = []
-        for e in self.objects:
-            if type(e) != Edge:
-                others.append(e)
-
-
-        w = Wire.assembleEdges(edges)
-        if not forConstruction:
-            self._addPendingWire(w)
-
-        return self.newObject(others + [w])
 
     def each(self, callBackFunction, useLocalCoordinates=False):
         """
@@ -1559,25 +1842,7 @@ class Workplane(CQ):
             better way to handle forConstruction
             project points not in the workplane plane onto the workplane plane
         """
-        def makeRectangleWire(pnt):
-            # Here pnt is in local coordinates due to useLocalCoords=True
-            # (xc,yc,zc) = pnt.toTuple()
-            if centered:
-                p1 = pnt.add(Vector(xLen/-2.0, yLen/-2.0, 0))
-                p2 = pnt.add(Vector(xLen/2.0, yLen/-2.0, 0))
-                p3 = pnt.add(Vector(xLen/2.0, yLen/2.0, 0))
-                p4 = pnt.add(Vector(xLen/-2.0, yLen/2.0, 0))
-            else:
-                p1 = pnt
-                p2 = pnt.add(Vector(xLen, 0, 0))
-                p3 = pnt.add(Vector(xLen, yLen, 0))
-                p4 = pnt.add(Vector(0, yLen, 0))
-
-            w = Wire.makePolygon([p1, p2, p3, p4, p1], forConstruction)
-            return w
-            #return Part.makePolygon([p1,p2,p3,p4,p1])
-
-        return self.eachpoint(makeRectangleWire, True)
+        raise NotImplementedError("Delegate to sketch")
 
     #circle from current point
     def circle(self, radius, forConstruction=False):
@@ -1609,12 +1874,7 @@ class Workplane(CQ):
             project points not in the workplane plane onto the workplane plane
 
         """
-        def makeCircleWire(obj):
-            cir = Wire.makeCircle(radius, obj, Vector(0, 0, 1))
-            cir.forConstruction = forConstruction
-            return cir
-
-        return self.eachpoint(makeCircleWire, useLocalCoordinates=True)
+        raise NotImplementedError("Delegate to sketch")
 
     def polygon(self, nSides, diameter, forConstruction=False):
         """
@@ -1627,16 +1887,7 @@ class Workplane(CQ):
         :param diameter: the size of the circle the polygon is inscribed into
         :return: a polygon wire
         """
-        def _makePolygon(center):
-            #pnt is a vector in local coordinates
-            angle = 2.0 * math.pi / nSides
-            pnts = []
-            for i in range(nSides+1):
-                pnts.append(center + Vector((diameter / 2.0 * math.cos(angle*i)),
-                                            (diameter / 2.0 * math.sin(angle*i)), 0))
-            return Wire.makePolygon(pnts, forConstruction)
-
-        return self.eachpoint(_makePolygon, True)
+        raise NotImplementedError("Delegate to sketch")
 
     def polyline(self, listOfXYTuple, forConstruction=False):
         """
@@ -1651,26 +1902,7 @@ class Workplane(CQ):
 
         *NOTE* most commonly, the resulting wire should be closed.
         """
-
-        # Our list of new edges that will go into a new CQ object
-        edges = []
-
-        # The very first startPoint comes from our original object, but not after that
-        startPoint = self._findFromPoint(False)
-
-        # Draw a line for each set of points, starting from the from-point of the original CQ object
-        for curTuple in listOfXYTuple:
-            endPoint = self.plane.toWorldCoords(curTuple)
-
-            edges.append(Edge.makeLine(startPoint, endPoint))
-
-            # We need to move the start point for the next line that we draw or we get stuck at the same startPoint
-            startPoint = endPoint
-
-            if not forConstruction:
-                self._addPendingEdge(edges[-1])
-
-        return self.newObject(edges)
+        raise NotImplementedError("Delegate to sketch")
 
     def close(self):
         """
@@ -1686,12 +1918,15 @@ class Workplane(CQ):
 
             s = Workplane().lineTo(1,0).lineTo(1,1).close().extrude(0.2)
         """
+        raise NotImplementedError("Delegate to sketch.solve")
+        """
         self.lineTo(self.ctx.firstPoint.x, self.ctx.firstPoint.y)
 
         # Need to reset the first point after closing a wire
         self.ctx.firstPoint=None
 
         return self.wire()
+        """
 
     def largestDimension(self):
         """
@@ -1700,6 +1935,8 @@ class Workplane(CQ):
         how long or wide a feature must be to make sure to cut through all of the material
         :return: A value representing the largest dimension of the first solid on the stack
         """
+        raise NotImplementedError("Delegate to an operation")
+        """"
         #TODO: this implementation is naive and returns the dims of the first solid... most of
         #TODO: the time this works. but a stronger implementation would be to search all solids.
         s = self.findSolid()
@@ -1707,518 +1944,9 @@ class Workplane(CQ):
             return s.BoundingBox().DiagonalLength * 5.0
         else:
             return -1
-
-    def cutEach(self, fcn, useLocalCoords=False, clean=True):
         """
-        Evaluates the provided function at each point on the stack (ie, eachpoint)
-        and then cuts the result from the context solid.
-        :param fcn: a function suitable for use in the eachpoint method: ie, that accepts a vector
-        :param useLocalCoords: same as for :py:meth:`eachpoint`
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :return: a CQ object that contains the resulting solid
-        :raises: an error if there is not a context solid to cut from
-        """
-        ctxSolid = self.findSolid()
-        if ctxSolid is None:
-            raise ValueError("Must have a solid in the chain to cut from!")
+        
 
-        #will contain all of the counterbores as a single compound
-        results = self.eachpoint(fcn, useLocalCoords).vals()
-        s = ctxSolid
-        for cb in results:
-            s = s.cut(cb)
-
-        if clean: s = s.clean()
-
-        ctxSolid.wrapped = s.wrapped
-        return self.newObject([s])
-
-    #but parameter list is different so a simple function pointer wont work
-    def cboreHole(self, diameter, cboreDiameter, cboreDepth, depth=None, clean=True):
-        """
-        Makes a counterbored hole for each item on the stack.
-
-        :param diameter: the diameter of the hole
-        :type diameter: float > 0
-        :param cboreDiameter: the diameter of the cbore
-        :type cboreDiameter: float > 0 and > diameter
-        :param cboreDepth: depth of the counterbore
-        :type cboreDepth: float > 0
-        :param depth: the depth of the hole
-        :type depth: float > 0 or None to drill thru the entire part.
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-
-        The surface of the hole is at the current workplane plane.
-
-        One hole is created for each item on the stack.  A very common use case is to use a
-        construction rectangle to define the centers of a set of holes, like so::
-
-                s = Workplane(Plane.XY()).box(2,4,0.5).faces(">Z").workplane()\
-                    .rect(1.5,3.5,forConstruction=True)\
-                    .vertices().cboreHole(0.125, 0.25,0.125,depth=None)
-
-        This sample creates a plate with a set of holes at the corners.
-
-        **Plugin Note**: this is one example of the power of plugins. Counterbored holes are quite
-        time consuming to create, but are quite easily defined by users.
-
-        see :py:meth:`cskHole` to make countersinks instead of counterbores
-        """
-        if depth is None:
-            depth = self.largestDimension()
-
-        def _makeCbore(center):
-            """
-            Makes a single hole with counterbore at the supplied point
-            returns a solid suitable for subtraction
-            pnt is in local coordinates
-            """
-            boreDir = Vector(0, 0, -1)
-            #first make the hole
-            hole = Solid.makeCylinder(diameter/2.0, depth, center, boreDir)  # local coordianates!
-
-            #add the counter bore
-            cbore = Solid.makeCylinder(cboreDiameter / 2.0, cboreDepth, center, boreDir)
-            r = hole.fuse(cbore)
-            return r
-
-        return self.cutEach(_makeCbore, True, clean)
-
-    #TODO: almost all code duplicated!
-    #but parameter list is different so a simple function pointer wont work
-    def cskHole(self, diameter, cskDiameter, cskAngle, depth=None, clean=True):
-        """
-        Makes a countersunk hole for each item on the stack.
-
-        :param diameter: the diameter of the hole
-        :type diameter: float > 0
-        :param cskDiameter: the diameter of the countersink
-        :type cskDiameter: float > 0 and > diameter
-        :param cskAngle: angle of the countersink, in degrees ( 82 is common )
-        :type cskAngle: float > 0
-        :param depth: the depth of the hole
-        :type depth: float > 0 or None to drill thru the entire part.
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-
-        The surface of the hole is at the current workplane.
-
-        One hole is created for each item on the stack.  A very common use case is to use a
-        construction rectangle to define the centers of a set of holes, like so::
-
-                s = Workplane(Plane.XY()).box(2,4,0.5).faces(">Z").workplane()\
-                    .rect(1.5,3.5,forConstruction=True)\
-                    .vertices().cskHole(0.125, 0.25,82,depth=None)
-
-        This sample creates a plate with a set of holes at the corners.
-
-        **Plugin Note**: this is one example of the power of plugins. CounterSunk holes are quite
-        time consuming to create, but are quite easily defined by users.
-
-        see :py:meth:`cboreHole` to make counterbores instead of countersinks
-        """
-
-        if depth is None:
-            depth = self.largestDimension()
-
-        def _makeCsk(center):
-            #center is in local coordinates
-
-            boreDir = Vector(0, 0, -1)
-
-            #first make the hole
-            hole = Solid.makeCylinder(diameter/2.0, depth, center, boreDir)  # local coords!
-            r = cskDiameter / 2.0
-            h = r / math.tan(math.radians(cskAngle / 2.0))
-            csk = Solid.makeCone(r, 0.0, h, center, boreDir)
-            r = hole.fuse(csk)
-            return r
-
-        return self.cutEach(_makeCsk, True, clean)
-
-    #TODO: almost all code duplicated!
-    #but parameter list is different so a simple function pointer wont work
-    def hole(self, diameter, depth=None, clean=True):
-        """
-        Makes a hole for each item on the stack.
-
-        :param diameter: the diameter of the hole
-        :type diameter: float > 0
-        :param depth: the depth of the hole
-        :type depth: float > 0 or None to drill thru the entire part.
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-
-        The surface of the hole is at the current workplane.
-
-        One hole is created for each item on the stack.  A very common use case is to use a
-        construction rectangle to define the centers of a set of holes, like so::
-
-                s = Workplane(Plane.XY()).box(2,4,0.5).faces(">Z").workplane()\
-                    .rect(1.5,3.5,forConstruction=True)\
-                    .vertices().hole(0.125, 0.25,82,depth=None)
-
-        This sample creates a plate with a set of holes at the corners.
-
-        **Plugin Note**: this is one example of the power of plugins. CounterSunk holes are quite
-        time consuming to create, but are quite easily defined by users.
-
-        see :py:meth:`cboreHole` and :py:meth:`cskHole` to make counterbores or countersinks
-        """
-        if depth is None:
-            depth = self.largestDimension()
-
-        def _makeHole(center):
-            """
-            Makes a single hole with counterbore at the supplied point
-            returns a solid suitable for subtraction
-            pnt is in local coordinates
-            """
-            boreDir = Vector(0, 0, -1)
-            #first make the hole
-            hole = Solid.makeCylinder(diameter / 2.0, depth, center, boreDir)  # local coordinates!
-            return hole
-
-        return self.cutEach(_makeHole, True, clean)
-
-    #TODO: duplicated code with _extrude and extrude
-    def twistExtrude(self, distance, angleDegrees, combine=True, clean=True):
-        """
-        Extrudes a wire in the direction normal to the plane, but also twists by the specified
-        angle over the length of the extrusion
-
-        The center point of the rotation will be the center of the workplane
-
-        See extrude for more details, since this method is the same except for the the addition
-        of the angle. In fact, if angle=0, the result is the same as a linear extrude.
-
-        **NOTE**  This method can create complex calculations, so be careful using it with
-        complex geometries
-
-        :param distance: the distance to extrude normal to the workplane
-        :param angle: angline ( in degrees) to rotate through the extrusion
-        :param boolean combine: True to combine the resulting solid with parent solids if found.
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :return: a CQ object with the resulting solid selected.
-        """
-        #group wires together into faces based on which ones are inside the others
-        #result is a list of lists
-        wireSets = sortWiresByBuildOrder(list(self.ctx.pendingWires), self.plane, [])
-
-        self.ctx.pendingWires = []  # now all of the wires have been used to create an extrusion
-
-        #compute extrusion vector and extrude
-        eDir = self.plane.zDir.multiply(distance)
-
-        #one would think that fusing faces into a compound and then extruding would work,
-        #but it doesnt-- the resulting compound appears to look right, ( right number of faces, etc)
-        #but then cutting it from the main solid fails with BRep_NotDone.
-        #the work around is to extrude each and then join the resulting solids, which seems to work
-
-        #underlying cad kernel can only handle simple bosses-- we'll aggregate them if there
-        # are multiple sets
-        r = None
-        for ws in wireSets:
-            thisObj = Solid.extrudeLinearWithRotation(ws[0], ws[1:], self.plane.origin,
-                                                      eDir, angleDegrees)
-            if r is None:
-                r = thisObj
-            else:
-                r = r.fuse(thisObj)
-
-        if combine:
-            newS = self._combineWithBase(r)
-        else:
-            newS = self.newObject([r])
-        if clean: newS = newS.clean()
-        return newS
-
-    def extrude(self, distance, combine=True, clean=True, both=False):
-        """
-        Use all un-extruded wires in the parent chain to create a prismatic solid.
-
-        :param distance: the distance to extrude, normal to the workplane plane
-        :type distance: float, negative means opposite the normal direction
-        :param boolean combine: True to combine the resulting solid with parent solids if found.
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :param boolean both: extrude in both directions symmetrically
-        :return: a CQ object with the resulting solid selected.
-
-        extrude always *adds* material to a part.
-
-        The returned object is always a CQ object, and depends on wither combine is True, and
-        whether a context solid is already defined:
-
-        *  if combine is False, the new value is pushed onto the stack.
-        *  if combine is true, the value is combined with the context solid if it exists,
-           and the resulting solid becomes the new context solid.
-
-        FutureEnhancement:
-            Support for non-prismatic extrusion ( IE, sweeping along a profile, not just
-            perpendicular to the plane extrude to surface. this is quite tricky since the surface
-            selected may not be planar
-        """               
-        r = self._extrude(distance,both=both)  # returns a Solid (or a compound if there were multiple)
-            
-        if combine:
-            newS = self._combineWithBase(r)
-        else:
-            newS = self.newObject([r])
-        if clean: newS = newS.clean()
-        return newS
-
-    def revolve(self, angleDegrees=360.0, axisStart=None, axisEnd=None, combine=True, clean=True):
-        """
-        Use all un-revolved wires in the parent chain to create a solid.
-
-        :param angleDegrees: the angle to revolve through.
-        :type angleDegrees: float, anything less than 360 degrees will leave the shape open
-        :param axisStart: the start point of the axis of rotation
-        :type axisStart: tuple, a two tuple
-        :param axisEnd: the end point of the axis of rotation
-        :type axisEnd: tuple, a two tuple
-        :param combine: True to combine the resulting solid with parent solids if found.
-        :type combine: boolean, combine with parent solid
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :return: a CQ object with the resulting solid selected.
-
-        The returned object is always a CQ object, and depends on wither combine is True, and
-        whether a context solid is already defined:
-
-        *  if combine is False, the new value is pushed onto the stack.
-        *  if combine is true, the value is combined with the context solid if it exists,
-           and the resulting solid becomes the new context solid.
-        """
-        #Make sure we account for users specifying angles larger than 360 degrees
-        angleDegrees %= 360.0
-
-        #Compensate for FreeCAD not assuming that a 0 degree revolve means a 360 degree revolve
-        angleDegrees = 360.0 if angleDegrees == 0 else angleDegrees
-
-        # The default start point of the vector defining the axis of rotation will be the origin
-        # of the workplane
-        if axisStart is None:
-            axisStart = self.plane.toWorldCoords((0, 0)).toTuple()
-        else:
-            axisStart = self.plane.toWorldCoords(axisStart).toTuple()
-
-        # The default end point of the vector defining the axis of rotation should be along the
-        # normal from the plane
-        if axisEnd is None:
-            # Make sure we match the user's assumed axis of rotation if they specified an start
-            # but not an end
-            if axisStart[1] != 0:
-                axisEnd = self.plane.toWorldCoords((0, axisStart[1])).toTuple()
-            else:
-                axisEnd = self.plane.toWorldCoords((0, 1)).toTuple()
-        else:
-            axisEnd = self.plane.toWorldCoords(axisEnd).toTuple()
-
-        # returns a Solid (or a compound if there were multiple)
-        r = self._revolve(angleDegrees, axisStart, axisEnd)
-        if combine:
-            newS = self._combineWithBase(r)
-        else:
-            newS = self.newObject([r])
-        if clean: newS = newS.clean()
-        return newS
-
-    def sweep(self, path, makeSolid=True, isFrenet=False, combine=True, clean=True):
-        """
-        Use all un-extruded wires in the parent chain to create a swept solid.
-
-        :param path: A wire along which the pending wires will be swept
-        :param boolean combine: True to combine the resulting solid with parent solids if found.
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :return: a CQ object with the resulting solid selected.
-        """
-
-        r = self._sweep(path.wire(), makeSolid, isFrenet)  # returns a Solid (or a compound if there were multiple)
-        if combine:
-            newS = self._combineWithBase(r)
-        else:
-            newS = self.newObject([r])
-        if clean: newS = newS.clean()
-        return newS
-
-    def _combineWithBase(self, obj):
-        """
-        Combines the provided object with the base solid, if one can be found.
-        :param obj:
-        :return: a new object that represents the result of combining the base object with obj,
-           or obj if one could not be found
-        """
-        baseSolid = self.findSolid(searchParents=True)
-        r = obj
-        if baseSolid is not None:
-            r = baseSolid.fuse(obj)
-            baseSolid.wrapped = r.wrapped
-
-        return self.newObject([r])
-
-    def combine(self, clean=True):
-        """
-        Attempts to combine all of the items on the stack into a single item.
-        WARNING: all of the items must be of the same type!
-
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :raises: ValueError if there are no items on the stack, or if they cannot be combined
-        :return: a CQ object with the resulting object selected
-        """
-        items = list(self.objects)
-        s = items.pop(0)
-        for ss in items:
-            s = s.fuse(ss)
-
-        if clean: s = s.clean()
-
-        return self.newObject([s])
-
-    def union(self, toUnion=None, combine=True, clean=True):
-        """
-        Unions all of the items on the stack of toUnion with the current solid.
-        If there is no current solid, the items in toUnion are unioned together.
-        if combine=True, the result and the original are updated to point to the new object
-        if combine=False, the result will be on the stack, but the original is unmodified
-
-        :param toUnion:
-        :type toUnion: a solid object, or a CQ object having a solid,
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :raises: ValueError if there is no solid to add to in the chain
-        :return: a CQ object with the resulting object selected
-        """
-
-        #first collect all of the items together
-        if type(toUnion) == CQ or type(toUnion) == Workplane:
-            solids = toUnion.solids().vals()
-            if len(solids) < 1:
-                raise ValueError("CQ object  must have at least one solid on the stack to union!")
-            newS = solids.pop(0)
-            for s in solids:
-                newS = newS.fuse(s)
-        elif type(toUnion) == Solid:
-            newS = toUnion
-        else:
-            raise ValueError("Cannot union type '{}'".format(type(toUnion)))
-
-        #now combine with existing solid, if there is one
-        # look for parents to cut from
-        solidRef = self.findSolid(searchStack=True, searchParents=True)
-        if combine and solidRef is not None:
-            r = solidRef.fuse(newS)
-            solidRef.wrapped = newS.wrapped
-        else:
-            r = newS
-
-        if clean: r = r.clean()
-
-        return self.newObject([r])
-
-    def cut(self, toCut, combine=True, clean=True):
-        """
-        Cuts the provided solid from the current solid, IE, perform a solid subtraction
-
-        if combine=True, the result and the original are updated to point to the new object
-        if combine=False, the result will be on the stack, but the original is unmodified
-
-        :param toCut: object to cut
-        :type toCut: a solid object, or a CQ object having a solid,
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :raises: ValueError if there is no solid to subtract from in the chain
-        :return: a CQ object with the resulting object selected
-        """
-
-        # look for parents to cut from
-        solidRef = self.findSolid(searchStack=True, searchParents=True)
-
-        if solidRef is None:
-            raise ValueError("Cannot find solid to cut from")
-        solidToCut = None
-        if type(toCut) == CQ or type(toCut) == Workplane:
-            solidToCut = toCut.val()
-        elif type(toCut) == Solid:
-            solidToCut = toCut
-        else:
-            raise ValueError("Cannot cut type '{}'".format(type(toCut)))
-
-        newS = solidRef.cut(solidToCut)
-
-        if clean: newS = newS.clean()
-
-        if combine:
-            solidRef.wrapped = newS.wrapped
-
-        return self.newObject([newS])
-
-    def cutBlind(self, distanceToCut, clean=True):
-        """
-        Use all un-extruded wires in the parent chain to create a prismatic cut from existing solid.
-
-        Similar to extrude, except that a solid in the parent chain is required to remove material
-        from. cutBlind always removes material from a part.
-
-        :param distanceToCut: distance to extrude before cutting
-        :type distanceToCut: float, >0 means in the positive direction of the workplane normal,
-            <0 means in the negative direction
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :raises: ValueError if there is no solid to subtract from in the chain
-        :return: a CQ object with the resulting object selected
-
-        see :py:meth:`cutThruAll` to cut material from the entire part
-
-        Future Enhancements:
-            Cut Up to Surface
-        """
-        #first, make the object
-        toCut = self._extrude(distanceToCut)
-
-        #now find a solid in the chain
-
-        solidRef = self.findSolid()
-
-        s = solidRef.cut(toCut)
-
-        if clean: s = s.clean()
-
-        solidRef.wrapped = s.wrapped
-        return self.newObject([s])
-
-    def cutThruAll(self, positive=False, clean=True):
-        """
-        Use all un-extruded wires in the parent chain to create a prismatic cut from existing solid.
-
-        Similar to extrude, except that a solid in the parent chain is required to remove material
-        from. cutThruAll always removes material from a part.
-
-        :param boolean positive: True to cut in the positive direction, false to cut in the
-            negative direction
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :raises: ValueError if there is no solid to subtract from in the chain
-        :return: a CQ object with the resulting object selected
-
-        see :py:meth:`cutBlind` to cut material to a limited depth
-        """
-        maxDim = self.largestDimension()
-        if not positive:
-            maxDim *= (-1.0)
-
-        return self.cutBlind(maxDim, clean)
-
-    def loft(self, filled=True, ruled=False, combine=True):
-        """
-        Make a lofted solid, through the set of wires.
-        :return: a CQ object containing the created loft
-        """
-        wiresToLoft = self.ctx.pendingWires
-        self.ctx.pendingWires = []
-
-        r = Solid.makeLoft(wiresToLoft, ruled)
-
-        if combine:
-            parentSolid = self.findSolid(searchStack=False, searchParents=True)
-            if parentSolid is not None:
-                r = parentSolid.fuse(r)
-                parentSolid.wrapped = r.wrapped
-
-        return self.newObject([r])
 
     def _extrude(self, distance, both=False):
         """
