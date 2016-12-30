@@ -20,10 +20,15 @@ class BaseCut_Operation(BaseOperation): pass
 class BaseChamfer_Operation(BaseOperation): pass
 class BaseSplitOperation(BaseOperation):pass
 class BaseFillet_Operation(BaseOperation): pass
+class BaseClean_Operation(BaseOperation): pass
+class BaseHole_Operation(BaseOperation): pass
+class BaseCbore_Operation(BaseOperation): pass
+class BaseCountersink_Operation(BaseOperation): pass
 
 #Transformations
 class BaseRotate_Operation(BaseOperation): pass
-class BaseTranslate_OPeration(BaseOperation): pass
+class BaseTranslate_Operation(BaseOperation): pass
+class BaseTranform_Operation(BaseOperation):pass
 
 #Face Operations
 class BaseFaceCut_Operation(BaseOperation):pass

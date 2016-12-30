@@ -30,7 +30,6 @@ class Context(object):
         self.id_generator= IdGenerator()
 
 
-
 class IdGenerator(object):
     """
         Returns ids like 'extrude1' or 'line2'. 

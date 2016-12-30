@@ -14,7 +14,8 @@ install:
 - sudo $CONDA_HOME/bin/pip install -r requirements-dev.txt
 - sudo $CONDA_HOME/bin/python ./setup.py install
 script:
-- sh runtests.sh
+- CQ_BACKEND=pythonOCC && $CONDA_HOME/bin/py.test -s --cov
+- CQ_BACKEND=FreeCAD && $CONDA_HOME/bin/py.test -s --cov
 after_success:
 - coveralls
 #- travis-sphinx deploy

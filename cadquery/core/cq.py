@@ -271,15 +271,12 @@ class CQ(object):
 
         see :py:meth:`cskHole` to make countersinks instead of counterbores
         """
+        raise NotImplementedError("Delegate to CboreOperation")
+        """
         if depth is None:
             depth = self.largestDimension()
 
         def _makeCbore(center):
-            """
-            Makes a single hole with counterbore at the supplied point
-            returns a solid suitable for subtraction
-            pnt is in local coordinates
-            """
             boreDir = Vector(0, 0, -1)
             #first make the hole
             hole = Solid.makeCylinder(diameter/2.0, depth, center, boreDir)  # local coordianates!
@@ -290,9 +287,8 @@ class CQ(object):
             return r
 
         return self.cutEach(_makeCbore, True, clean)
+        """
 
-    #TODO: almost all code duplicated!
-    #but parameter list is different so a simple function pointer wont work
     def cskHole(self, diameter, cskDiameter, cskAngle, depth=None, clean=True):
         """
         Makes a countersunk hole for each item on the stack.
@@ -323,7 +319,8 @@ class CQ(object):
 
         see :py:meth:`cboreHole` to make counterbores instead of countersinks
         """
-
+        raise NotImplementedError("Delegate to CskOperation")
+        """
         if depth is None:
             depth = self.largestDimension()
 
@@ -341,9 +338,8 @@ class CQ(object):
             return r
 
         return self.cutEach(_makeCsk, True, clean)
+        """
 
-    #TODO: almost all code duplicated!
-    #but parameter list is different so a simple function pointer wont work
     def hole(self, diameter, depth=None, clean=True):
         """
         Makes a hole for each item on the stack.
@@ -370,73 +366,20 @@ class CQ(object):
 
         see :py:meth:`cboreHole` and :py:meth:`cskHole` to make counterbores or countersinks
         """
+        raise NotImplementedError("Delegate to HoleOperation")
+        """
         if depth is None:
             depth = self.largestDimension()
 
         def _makeHole(center):
-            """
-            Makes a single hole with counterbore at the supplied point
-            returns a solid suitable for subtraction
-            pnt is in local coordinates
-            """
             boreDir = Vector(0, 0, -1)
             #first make the hole
             hole = Solid.makeCylinder(diameter / 2.0, depth, center, boreDir)  # local coordinates!
             return hole
 
         return self.cutEach(_makeHole, True, clean)
-
-    #TODO: duplicated code with _extrude and extrude
-    def twistExtrude(self, distance, angleDegrees, combine=True, clean=True):
         """
-        Extrudes a wire in the direction normal to the plane, but also twists by the specified
-        angle over the length of the extrusion
 
-        The center point of the rotation will be the center of the workplane
-
-        See extrude for more details, since this method is the same except for the the addition
-        of the angle. In fact, if angle=0, the result is the same as a linear extrude.
-
-        **NOTE**  This method can create complex calculations, so be careful using it with
-        complex geometries
-
-        :param distance: the distance to extrude normal to the workplane
-        :param angle: angline ( in degrees) to rotate through the extrusion
-        :param boolean combine: True to combine the resulting solid with parent solids if found.
-        :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
-        :return: a CQ object with the resulting solid selected.
-        """
-        #group wires together into faces based on which ones are inside the others
-        #result is a list of lists
-        wireSets = sortWiresByBuildOrder(list(self.ctx.pendingWires), self.plane, [])
-
-        self.ctx.pendingWires = []  # now all of the wires have been used to create an extrusion
-
-        #compute extrusion vector and extrude
-        eDir = self.plane.zDir.multiply(distance)
-
-        #one would think that fusing faces into a compound and then extruding would work,
-        #but it doesnt-- the resulting compound appears to look right, ( right number of faces, etc)
-        #but then cutting it from the main solid fails with BRep_NotDone.
-        #the work around is to extrude each and then join the resulting solids, which seems to work
-
-        #underlying cad kernel can only handle simple bosses-- we'll aggregate them if there
-        # are multiple sets
-        r = None
-        for ws in wireSets:
-            thisObj = Solid.extrudeLinearWithRotation(ws[0], ws[1:], self.plane.origin,
-                                                      eDir, angleDegrees)
-            if r is None:
-                r = thisObj
-            else:
-                r = r.fuse(thisObj)
-
-        if combine:
-            newS = self._combineWithBase(r)
-        else:
-            newS = self.newObject([r])
-        if clean: newS = newS.clean()
-        return newS
 
     def extrude(self, distance, combine=True, clean=True, both=False):
         """
@@ -462,7 +405,9 @@ class CQ(object):
             Support for non-prismatic extrusion ( IE, sweeping along a profile, not just
             perpendicular to the plane extrude to surface. this is quite tricky since the surface
             selected may not be planar
-        """               
+        """
+        raise NotImplementedError("Delegate to ExtrudeOperation")
+        """
         r = self._extrude(distance,both=both)  # returns a Solid (or a compound if there were multiple)
             
         if combine:
@@ -471,6 +416,7 @@ class CQ(object):
             newS = self.newObject([r])
         if clean: newS = newS.clean()
         return newS
+        """
 
     def revolve(self, angleDegrees=360.0, axisStart=None, axisEnd=None, combine=True, clean=True):
         """
@@ -493,6 +439,8 @@ class CQ(object):
         *  if combine is False, the new value is pushed onto the stack.
         *  if combine is true, the value is combined with the context solid if it exists,
            and the resulting solid becomes the new context solid.
+        """
+        raise NotImplementedError("Delegate to RevolveOperation")
         """
         #Make sure we account for users specifying angles larger than 360 degrees
         angleDegrees %= 360.0
@@ -527,7 +475,8 @@ class CQ(object):
             newS = self.newObject([r])
         if clean: newS = newS.clean()
         return newS
-
+        """
+        
     def sweep(self, path, makeSolid=True, isFrenet=False, combine=True, clean=True):
         """
         Use all un-extruded wires in the parent chain to create a swept solid.
@@ -537,7 +486,8 @@ class CQ(object):
         :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
         :return: a CQ object with the resulting solid selected.
         """
-
+        raise NotImplementedError("Delegate to SweepOperation")
+        """
         r = self._sweep(path.wire(), makeSolid, isFrenet)  # returns a Solid (or a compound if there were multiple)
         if combine:
             newS = self._combineWithBase(r)
@@ -545,7 +495,8 @@ class CQ(object):
             newS = self.newObject([r])
         if clean: newS = newS.clean()
         return newS
-
+        """
+        
     def _combineWithBase(self, obj):
         """
         Combines the provided object with the base solid, if one can be found.
@@ -1607,6 +1558,8 @@ class Workplane(CQ):
         Future Enhancements:
           * provide access to control points
         """
+        raise NotImplementedError("Delegate to Sketch")
+        """
         gstartPoint = self._findFromPoint(False)
         gEndPoint = self.plane.toWorldCoords(listOfXYTuple[-1])
 
@@ -1619,7 +1572,8 @@ class Workplane(CQ):
             self._addPendingEdge(e)
 
         return self.newObject([e])
-
+        """
+        
     def threePointArc(self, point1, point2, forConstruction=False):
         """
         Draw an arc from the current point, through point1, and ending at point2
@@ -1635,7 +1589,8 @@ class Workplane(CQ):
             provide a centerpoint arc
             provide tangent arcs
         """
-
+        raise NotImplementedError("Delegate to Sketch")
+        """
         gstartPoint = self._findFromPoint(False)
         gpoint1 = self.plane.toWorldCoords(point1)
         gpoint2 = self.plane.toWorldCoords(point2)
@@ -1646,7 +1601,7 @@ class Workplane(CQ):
             self._addPendingEdge(arc)
 
         return self.newObject([arc])
-
+        """
     def rotateAndCopy(self, matrix):
         """
         Makes a copy of all edges on the stack, rotates them according to the
@@ -1665,7 +1620,8 @@ class Workplane(CQ):
         Future Enhancements:
             faster implementation: this one transforms 3 times to accomplish the result
         """
-
+        raise NotImplementedError("Delegate to TransformOperation")
+        """
         #convert edges to a wire, if there are pending edges
         n = self.wire(forConstruction=False)
 
@@ -1682,6 +1638,7 @@ class Workplane(CQ):
         c = consolidated.consolidateWires()
 
         return c
+        """
 
     def mirrorY(self):
         """
@@ -1701,10 +1658,8 @@ class Workplane(CQ):
         Future Enhancements:
             mirrorX().mirrorY() should work but doesnt, due to some FreeCAD weirdness
         """
-        tm = Matrix()
-        tm.rotateY(math.pi)
-        return self.rotateAndCopy(tm)
-
+        raise NotImplementedError("Delegate to Sketch")
+        
     def mirrorX(self):
         """
         Mirror entities around the x axis of the workplane plane.
@@ -1719,21 +1674,8 @@ class Workplane(CQ):
         Future Enhancements:
             mirrorX().mirrorY() should work but doesnt, due to some FreeCAD weirdness
         """
-        tm = Matrix()
-        tm.rotateX(math.pi)
-        return self.rotateAndCopy(tm)
+        raise NotImplementedError("Delegate to Sketch")
 
-    def _addPendingEdge(self, edge):
-        """
-        Queues an edge for later combination into a wire.
-
-        :param edge:
-        :return:
-        """
-        self.ctx.pendingEdges.append(edge)
-
-        if self.ctx.firstPoint is None:
-            self.ctx.firstPoint = self.plane.toLocalCoords(edge.startPoint())
 
 
     def each(self, callBackFunction, useLocalCoordinates=False):
@@ -1945,117 +1887,6 @@ class Workplane(CQ):
         else:
             return -1
         """
-        
-
-
-    def _extrude(self, distance, both=False):
-        """
-        Make a prismatic solid from the existing set of pending wires.
-
-        :param distance: distance to extrude
-        :param boolean both: extrude in both directions symmetrically
-        :return: a FreeCAD solid, suitable for boolean operations.
-
-        This method is a utility method, primarily for plugin and internal use.
-        It is the basis for cutBlind,extrude,cutThruAll, and all similar methods.
-
-        Future Enhancements:
-            extrude along a profile (sweep)
-        """
-
-        #group wires together into faces based on which ones are inside the others
-        #result is a list of lists
-        s = time.time()
-        wireSets = sortWiresByBuildOrder(list(self.ctx.pendingWires), self.plane, [])
-        #print "sorted wires in %d sec" % ( time.time() - s )
-        self.ctx.pendingWires = []  # now all of the wires have been used to create an extrusion
-
-        #compute extrusion vector and extrude
-        eDir = self.plane.zDir.multiply(distance)
-
-
-        #one would think that fusing faces into a compound and then extruding would work,
-        #but it doesnt-- the resulting compound appears to look right, ( right number of faces, etc)
-        #but then cutting it from the main solid fails with BRep_NotDone.
-        #the work around is to extrude each and then join the resulting solids, which seems to work
-
-        # underlying cad kernel can only handle simple bosses-- we'll aggregate them if there are
-        # multiple sets
-
-        # IMPORTANT NOTE: OCC is slow slow slow in boolean operations.  So you do NOT want to fuse
-        # each item to another and save the result-- instead, you want to combine all of the new
-        # items into a compound, and fuse them together!!!
-        # r = None
-        # for ws in wireSets:
-        #     thisObj = Solid.extrudeLinear(ws[0], ws[1:], eDir)
-        #     if r is None:
-        #         r = thisObj
-        #     else:
-        #         s = time.time()
-        #         r = r.fuse(thisObj)
-        #         print "Fused in %0.3f sec" % ( time.time() - s )
-        # return r
-
-        toFuse = []
-        for ws in wireSets:
-            thisObj = Solid.extrudeLinear(ws[0], ws[1:], eDir)
-            toFuse.append(thisObj)
-            
-            if both:
-                thisObj = Solid.extrudeLinear(ws[0], ws[1:], eDir.multiply(-1.))
-                toFuse.append(thisObj)
-
-        return Compound.makeCompound(toFuse)
-
-    def _revolve(self, angleDegrees, axisStart, axisEnd):
-        """
-        Make a solid from the existing set of pending wires.
-
-        :param angleDegrees: the angle to revolve through.
-        :type angleDegrees: float, anything less than 360 degrees will leave the shape open
-        :param axisStart: the start point of the axis of rotation
-        :type axisStart: tuple, a two tuple
-        :param axisEnd: the end point of the axis of rotation
-        :type axisEnd: tuple, a two tuple
-        :return: a FreeCAD solid, suitable for boolean operations.
-
-        This method is a utility method, primarily for plugin and internal use.
-        """
-        #We have to gather the wires to be revolved
-        wireSets = sortWiresByBuildOrder(list(self.ctx.pendingWires), self.plane, [])
-
-        #Mark that all of the wires have been used to create a revolution
-        self.ctx.pendingWires = []
-
-        #Revolve the wires, make a compound out of them and then fuse them
-        toFuse = []
-        for ws in wireSets:
-            thisObj = Solid.revolve(ws[0], ws[1:], angleDegrees, axisStart, axisEnd)
-            toFuse.append(thisObj)
-
-        return Compound.makeCompound(toFuse)
-
-    def _sweep(self, path, makeSolid=True, isFrenet=False):
-        """
-        Makes a swept solid from an existing set of pending wires.
-
-        :param path: A wire along which the pending wires will be swept
-        :return:a FreeCAD solid, suitable for boolean operations
-        """
-
-        # group wires together into faces based on which ones are inside the others
-        # result is a list of lists
-        s = time.time()
-        wireSets = sortWiresByBuildOrder(list(self.ctx.pendingWires), self.plane, [])
-        # print "sorted wires in %d sec" % ( time.time() - s )
-        self.ctx.pendingWires = []  # now all of the wires have been used to create an extrusion
-
-        toFuse = []
-        for ws in wireSets:
-            thisObj = Solid.sweep(ws[0], ws[1:], path.val(), makeSolid, isFrenet)
-            toFuse.append(thisObj)
-
-        return Compound.makeCompound(toFuse)
 
     def box(self, length, width, height, centered=(True, True, True), combine=True, clean=True):
         """
@@ -2099,28 +1930,7 @@ class Workplane(CQ):
                 .rect(3,3,forConstruction=True).vertices().box(0.25,0.25,0.25,combine=True)
 
         """
-
-        def _makebox(pnt):
-
-            #(xp,yp,zp) = self.plane.toLocalCoords(pnt)
-            (xp, yp, zp) = pnt.toTuple()
-            if centered[0]:
-                xp -= (length / 2.0)
-            if centered[1]:
-                yp -= (width / 2.0)
-            if centered[2]:
-                zp -= (height / 2.0)
-
-            return Solid.makeBox(length, width, height, Vector(xp, yp, zp))
-
-        boxes = self.eachpoint(_makebox, True)
-
-        #if combination is not desired, just return the created boxes
-        if not combine:
-            return boxes
-        else:
-            #combine everything
-            return self.union(boxes, clean=clean)
+        raise NotImplementedError("Delegate to BoxOperation")
 
     def sphere(self, radius, direct=(0, 0, 1), angle1=-90, angle2=90, angle3=360,
                centered=(True, True, True), combine=True, clean=True):
@@ -2158,38 +1968,8 @@ class Workplane(CQ):
 
         If combine is false, the result will be a list of the spheres produced
         """
+        raise NotImplementedError("Delegate to SphereOperation")
 
-        # Convert the direction tuple to a vector, if needed
-        if isinstance(direct, tuple):
-            direct = Vector(direct)
-
-        def _makesphere(pnt):
-            """
-            Inner function that is used to create a sphere for each point/object on the workplane
-            :param pnt: The center point for the sphere
-            :return: A CQ Solid object representing a sphere
-            """
-            (xp, yp, zp) = pnt.toTuple()
-
-            if not centered[0]:
-                xp += radius
-
-            if not centered[1]:
-                yp += radius
-
-            if not centered[2]:
-                zp += radius
-
-            return Solid.makeSphere(radius, Vector(xp, yp, zp), direct, angle1, angle2, angle3)
-
-        # We want a sphere for each point on the workplane
-        spheres = self.eachpoint(_makesphere, True)
-
-        # If we don't need to combine everything, just return the created spheres
-        if not combine:
-            return spheres
-        else:
-            return self.union(spheres, clean=clean)
 
     def clean(self):
         """
@@ -2212,8 +1992,5 @@ class Workplane(CQ):
         `clean` may fail to produce a clean output in some cases such as
         spherical faces.
         """
-        try:
-            cleanObjects = [obj.clean() for obj in self.objects]
-        except AttributeError:
-            raise AttributeError("%s object doesn't support `clean()` method!" % obj.ShapeType())
-        return self.newObject(cleanObjects)
+        raise NotImplementedError("Delegate to CleanOperation")
+
