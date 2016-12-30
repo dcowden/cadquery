@@ -14,6 +14,10 @@ install:
 - sudo $CONDA_HOME/bin/pip install -r requirements-dev.txt
 - sudo $CONDA_HOME/bin/python ./setup.py install
 script:
+# annoying! 
+# since travis cant set the path, runtests.sh doesnt work, because we'd have to put CONDA_HOME
+# in there-- but then it doesnt work locally
+# this is a workaround till i can fix that.
 - CQ_BACKEND=pythonOCC && $CONDA_HOME/bin/py.test -s --cov
 - CQ_BACKEND=FreeCAD && $CONDA_HOME/bin/py.test -s --cov
 after_success:

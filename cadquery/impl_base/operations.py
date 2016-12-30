@@ -60,3 +60,6 @@ class BaseShellSolid_Operation(BaseOperation): pass
 
 #Projection Operations
 class BaseProjectOntoPlane_Operation(BaseOperation): pass
+
+#Other Stuff
+class BaseCombine_Operation(BaseOperation): pass

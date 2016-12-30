@@ -56,6 +56,8 @@ class CQ(object):
         on it.  This is meant to be a reference to the most recently modified version
         of the context solid, whatever it is.
         """
+        raise NotImplementedError ("Not sure if we need this method any more ")
+        
         all = {}
         for o in self.objects:
 
@@ -90,7 +92,8 @@ class CQ(object):
                 #now cut it in half sideways
                 c.faces(">Y").workplane(-0.5).split(keepTop=True)
         """
-
+        raise NotImplementedError("Delegate to SplitOperation")
+        """
         solid = self.findSolid()
 
         if (not keepTop) and (not keepBottom):
@@ -115,45 +118,7 @@ class CQ(object):
             else:
                 solid.wrapped = bottom.wrapped
                 return self.newObject([bottom])
-
-    def combineSolids(self, otherCQToCombine=None):
         """
-        !!!DEPRECATED!!! use union()
-        Combines all solids on the current stack, and any context object, together
-        into a single object.
-
-        After the operation, the returned solid is also the context solid.
-
-        :param otherCQToCombine: another CadQuery to combine.
-        :return: a cQ object with the resulting combined solid on the stack.
-
-        Most of the time, both objects will contain a single solid, which is
-        combined and returned on the stack of the new object.
-        """
-        #loop through current stack objects, and combine them
-        #TODO: combine other types of objects as well, like edges and wires
-        toCombine = self.solids().vals()
-
-        if otherCQToCombine:
-            for obj in otherCQToCombine.solids().vals():
-                toCombine.append(obj)
-
-        if len(toCombine) < 1:
-            raise ValueError("Cannot Combine: at least one solid required!")
-
-        #get context solid and we don't want to find our own objects
-        ctxSolid = self.findSolid(searchStack=False, searchParents=True)
-
-        if ctxSolid is None:
-            ctxSolid = toCombine.pop(0)
-
-        #now combine them all. make sure to save a reference to the ctxSolid pointer!
-        s = ctxSolid
-        for tc in toCombine:
-            s = s.fuse(tc)
-
-        ctxSolid.wrapped = s.wrapped
-        return self.newObject([s])
 
     def all(self):
         """
@@ -224,7 +189,10 @@ class CQ(object):
         :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
         :return: a CQ object that contains the resulting solid
         :raises: an error if there is not a context solid to cut from
-        """     
+        """
+
+        raise NotImplementedError("Delgate to CutOperation")
+        """
         ctxSolid = self.findSolid()
         if ctxSolid is None:
             raise ValueError("Must have a solid in the chain to cut from!")
@@ -239,6 +207,7 @@ class CQ(object):
 
         ctxSolid.wrapped = s.wrapped
         return self.newObject([s])
+        """
 
     #but parameter list is different so a simple function pointer wont work
     def cboreHole(self, diameter, cboreDiameter, cboreDepth, depth=None, clean=True):
@@ -496,21 +465,7 @@ class CQ(object):
         if clean: newS = newS.clean()
         return newS
         """
-        
-    def _combineWithBase(self, obj):
-        """
-        Combines the provided object with the base solid, if one can be found.
-        :param obj:
-        :return: a new object that represents the result of combining the base object with obj,
-           or obj if one could not be found
-        """
-        baseSolid = self.findSolid(searchParents=True)
-        r = obj
-        if baseSolid is not None:
-            r = baseSolid.fuse(obj)
-            baseSolid.wrapped = r.wrapped
 
-        return self.newObject([r])
 
     def combine(self, clean=True):
         """
@@ -521,6 +476,8 @@ class CQ(object):
         :raises: ValueError if there are no items on the stack, or if they cannot be combined
         :return: a CQ object with the resulting object selected
         """
+        raise NotImplementedError("Delegate to Combine Operation")
+        """
         items = list(self.objects)
         s = items.pop(0)
         for ss in items:
@@ -529,7 +486,8 @@ class CQ(object):
         if clean: s = s.clean()
 
         return self.newObject([s])
-
+        """
+        
     def union(self, toUnion=None, combine=True, clean=True):
         """
         Unions all of the items on the stack of toUnion with the current solid.
@@ -543,7 +501,8 @@ class CQ(object):
         :raises: ValueError if there is no solid to add to in the chain
         :return: a CQ object with the resulting object selected
         """
-
+        raise NotImplementedError("Delegate to Union Operation")
+        """
         #first collect all of the items together
         if type(toUnion) == CQ or type(toUnion) == Workplane:
             solids = toUnion.solids().vals()
@@ -569,7 +528,7 @@ class CQ(object):
         if clean: r = r.clean()
 
         return self.newObject([r])
-
+        """
     def cut(self, toCut, combine=True, clean=True):
         """
         Cuts the provided solid from the current solid, IE, perform a solid subtraction
@@ -583,7 +542,8 @@ class CQ(object):
         :raises: ValueError if there is no solid to subtract from in the chain
         :return: a CQ object with the resulting object selected
         """
-
+        raise NotImplementedError("Delegate to Cut Operation")
+        """
         # look for parents to cut from
         solidRef = self.findSolid(searchStack=True, searchParents=True)
 
@@ -605,6 +565,7 @@ class CQ(object):
             solidRef.wrapped = newS.wrapped
 
         return self.newObject([newS])
+        """
 
     def cutBlind(self, distanceToCut, clean=True):
         """
@@ -625,6 +586,8 @@ class CQ(object):
         Future Enhancements:
             Cut Up to Surface
         """
+        raise NotImplementedError("Delegate to Cut Operation")
+        """
         #first, make the object
         toCut = self._extrude(distanceToCut)
 
@@ -638,6 +601,7 @@ class CQ(object):
 
         solidRef.wrapped = s.wrapped
         return self.newObject([s])
+        """
 
     def cutThruAll(self, positive=False, clean=True):
         """
@@ -654,16 +618,21 @@ class CQ(object):
 
         see :py:meth:`cutBlind` to cut material to a limited depth
         """
+        raise NotImplementedError("Delegate to Cut Operation")
+        """
         maxDim = self.largestDimension()
         if not positive:
             maxDim *= (-1.0)
 
         return self.cutBlind(maxDim, clean)
+        """
 
     def loft(self, filled=True, ruled=False, combine=True):
         """
         Make a lofted solid, through the set of wires.
         :return: a CQ object containing the created loft
+        """
+        raise NotImplementedError("Delegate to Loft Operation")
         """
         wiresToLoft = self.ctx.pendingWires
         self.ctx.pendingWires = []
@@ -677,7 +646,7 @@ class CQ(object):
                 parentSolid.wrapped = r.wrapped
 
         return self.newObject([r])        
-
+        """
 
     def workplane(self, offset=0.0, invert=False, centerOption='CenterOfMass'):
         """
@@ -720,6 +689,8 @@ class CQ(object):
             For now you can work around by creating a workplane and then offsetting the center
             afterwards.
         """
+        
+        raise NotImplementedError ("Need this method, for sure, but it needs to create a sketch.")
         def _isCoPlanar(f0, f1):
             """Test if two faces are on the same plane."""
             p0 = f0.Center()
@@ -845,40 +816,6 @@ class CQ(object):
             return self.parent
         else:
             raise ValueError("Cannot End the chain-- no parents!")
-
-    def findSolid(self, searchStack=True, searchParents=True):
-        """
-        Finds the first solid object in the chain, searching from the current node
-        backwards through parents until one is found.
-
-        :param searchStack: should objects on the stack be searched first.
-        :param searchParents: should parents be searched?
-        :raises: ValueError if no solid is found in the current object or its parents,
-            and errorOnEmpty is True
-
-        This function is very important for chains that are modifying a single parent object,
-        most often a solid.
-
-        Most of the time, a chain defines or selects a solid, and then modifies it using workplanes
-        or other operations.
-
-        Plugin Developers should make use of this method to find the solid that should be modified,
-        if the plugin implements a unary operation, or if the operation will automatically merge its
-        results with an object already on the stack.
-        """
-        #notfound = ValueError("Cannot find a Valid Solid to Operate on!")
-
-        if searchStack:
-            for s in self.objects:
-                if isinstance(s, Solid):
-                    return s
-                elif isinstance(s, Compound):
-                    return s.Solids()
-
-        if searchParents and self.parent is not None:
-            return self.parent.findSolid(searchStack=True, searchParents=searchParents)
-
-        return None
 
     def _selectObjects(self, objType, selector=None):
         """
@@ -1095,6 +1032,7 @@ class CQ(object):
         :type opts: dictionary, width and height
         :return: a string that contains SVG that represents this item.
         """
+        raise NotImplementedError("Export should maybe not be in here? Also, referece to Wrapped must be eliminated.")
         return exporters.getSVG(self.val().wrapped, opts)
 
     def exportSvg(self, fileName):
@@ -1106,6 +1044,7 @@ class CQ(object):
         :param fileName: the filename to export
         :type fileName: String, absolute path to the file
         """
+        raise NotImplementedError("Export should maybe not be in here? Also, referece to Wrapped must be eliminated.")
         exporters.exportSVG(self, fileName)
 
     def rotateAboutCenter(self, axisEndPoint, angleDegrees):
@@ -1132,7 +1071,8 @@ class CQ(object):
               of the axis is variable, while the end is fixed. This is fine when operating on
               one object, but is not cool for multiple.
         """
-
+        raise NotImplementedError("Delegate to TransformOperation")
+        """
         #center point is the first point in the vector
         endVec = Vector(axisEndPoint)
 
@@ -1142,7 +1082,8 @@ class CQ(object):
             return obj.rotate(startPt, endPt, angleDegrees)
 
         return self.each(_rot, False)
-
+        """
+        
     def rotate(self, axisStartPoint, axisEndPoint, angleDegrees):
         """
         Returns a copy of all of the items on the stack rotated through and angle around the axis
@@ -1156,21 +1097,11 @@ class CQ(object):
         :type angleDegrees: float
         :returns: a CQ object
         """
+        raise NotImplementedError("Delegate to TransformOperation")
+        """
         return self.newObject([o.rotate(axisStartPoint, axisEndPoint, angleDegrees)
                                for o in self.objects])
-
-    def mirror(self, mirrorPlane="XY", basePointVector=(0, 0, 0)):
-	"""
-	Mirror a single CQ object. This operation is the same as in the FreeCAD PartWB's mirroring
-
-	:param mirrorPlane: the plane to mirror about
-	:type mirrorPlane: string, one of "XY", "YX", "XZ", "ZX", "YZ", "ZY" the planes
-	:param basePointVector: the base point to mirror about
-	:type basePointVector: tuple
-	"""
-	newS = self.newObject([self.objects[0].mirror(mirrorPlane, basePointVector)])
-	return newS.first()
-
+        """
 
     def translate(self, vec):
         """
@@ -1180,8 +1111,10 @@ class CQ(object):
         :type  tupleDistance: a 3-tuple of float
         :returns: a CQ object
         """
+        raise NotImplementedError("Delegate to TransformOperation")
+        """
         return self.newObject([o.translate(vec) for o in self.objects])
-
+        """
 
     def shell(self, thickness):
         """
@@ -1219,6 +1152,8 @@ class CQ(object):
         Future Enhancements:
             Better selectors to make it easier to select multiple faces
         """
+        raise NotImplementedError("Delegate to ShellOperation")
+        """
         solidRef = self.findSolid()
 
         for f in self.objects:
@@ -1228,6 +1163,7 @@ class CQ(object):
         s = solidRef.shell(self.objects, thickness)
         solidRef.wrapped = s.wrapped
         return self.newObject([s])
+        """
 
     def fillet(self, radius):
         """
@@ -1246,6 +1182,8 @@ class CQ(object):
 
             s = Workplane().box(1,1,1).faces("+Z").edges().fillet(0.1)
         """
+        raise NotImplementedError("Delegate to FilletOperation")
+        """
         # TODO: we will need much better edge selectors for this to work
         # TODO: ensure that edges selected actually belong to the solid in the chain, otherwise,
         # TODO: we segfault
@@ -1259,7 +1197,8 @@ class CQ(object):
         s = solid.fillet(radius, edgeList)
         solid.wrapped = s.wrapped
         return self.newObject([s])
-
+        """
+        
     def chamfer(self, length, length2=None):
         """
         Chamfers a solid on the selected edges.
@@ -1288,6 +1227,8 @@ class CQ(object):
 
             s = Workplane("XY").box(1,1,1).faces("+Z").chamfer(0.2, 0.1)
         """
+        raise NotImplementedError("Delegate to ChamferOperation")
+        """
         solid = self.findSolid()
 
         edgeList = self.edges().vals()
@@ -1298,7 +1239,7 @@ class CQ(object):
 
         solid.wrapped = s.wrapped
         return self.newObject([s])
-
+        """
 
 class Workplane(CQ):
     def __init__(self, inPlane, origin=(0, 0, 0), ctx=None,sketch_id=None):
@@ -1402,7 +1343,8 @@ class Workplane(CQ):
 
         The result is a cube with a round boss on the corner
         """
-        "Shift local coordinates to the specified location, according to current coordinates"
+        raise NotImplementedError("Delegate to Sketch")
+        
         self.plane.setOrigin2d(x, y)
         n = self.newObject([self.plane.origin])
         return n
@@ -1417,6 +1359,8 @@ class Workplane(CQ):
 
         see :py:meth:`line` if you want to use relative dimensions to make a line instead.
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         startPoint = self._findFromPoint(False)
 
         endPoint = self.plane.toWorldCoords((x, y))
@@ -1440,6 +1384,8 @@ class Workplane(CQ):
 
         see :py:meth:`lineTo` if you want to use absolute coordinates to make a line instead.
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         p = self._findFromPoint(True)  # return local coordinates
         return self.lineTo(p.x + xDist, yDist + p.y, forConstruction)
 
@@ -1450,6 +1396,8 @@ class Workplane(CQ):
         :param float distance: (y) distance from current point
         :return: the workplane object with the current point at the end of the new line
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         return self.line(0, distance, forConstruction)
 
     def hLine(self, distance, forConstruction=False):
@@ -1459,6 +1407,8 @@ class Workplane(CQ):
         :param float distance: (x) distance from current point
         :return: the Workplane object with the current point at the end of the new line
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         return self.line(distance, 0, forConstruction)
 
     def vLineTo(self, yCoord, forConstruction=False):
@@ -1471,6 +1421,8 @@ class Workplane(CQ):
         :param float yCoord: y coordinate for the end of the line
         :return: the Workplane object with the current point at the end of the new line
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         p = self._findFromPoint(True)
         return self.lineTo(p.x, yCoord, forConstruction)
 
@@ -1484,6 +1436,8 @@ class Workplane(CQ):
         :param float xCoord: x coordinate for the end of the line
         :return: the Workplane object with the current point at the end of the new line
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         p = self._findFromPoint(True)
         return self.lineTo(xCoord, p.y, forConstruction)
 
@@ -1503,6 +1457,8 @@ class Workplane(CQ):
 
         See :py:meth:`move` to do the same thing but using relative dimensions
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         newCenter = Vector(x, y, 0)
         return self.newObject([self.plane.toWorldCoords(newCenter)])
 
@@ -1522,6 +1478,8 @@ class Workplane(CQ):
 
         See :py:meth:`moveTo` to do the same thing but using absolute coordinates
         """
+        raise NotImplementedError("Delegate to Sketch")
+        
         p = self._findFromPoint(True)
         newCenter = p + Vector(xDist, yDist, 0)
         return self.newObject([self.plane.toWorldCoords(newCenter)])
