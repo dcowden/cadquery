@@ -19,7 +19,7 @@ script:
 # in there-- but then it doesnt work locally
 # this is a workaround till i can fix that.
 - CQ_BACKEND=pythonOCC && $CONDA_HOME/bin/py.test -s --cov
-- CQ_BACKEND=FreeCAD && $CONDA_HOME/bin/py.test -s --cov
+#- CQ_BACKEND=FreeCAD && $CONDA_HOME/bin/py.test -s --cov
 after_success:
 - coveralls
 #- travis-sphinx deploy
