@@ -68,8 +68,8 @@ class ShapeLog(object):
         #we may need to tune this in the future for performance, but this meets the need for now
         self.actions = [] 
         
-    def log_shape_action(self,reference_type,action_type,shape):
-        self.actions.append( ReferenceEntry(id,reference_type,action_type,shape))
+    def log_shape_action(self,ref_id,reference_type,action_type,shape):
+        self.actions.append( ReferenceEntry(ref_id,reference_type,action_type,shape))
 
     def merge_log(self, another_log):
         # merges another log into this one
@@ -105,12 +105,12 @@ class ShapeLog(object):
                 matches = False
             if reference_type is not None and r.reference_type != reference_type :
                 matches = False
-            if for_id is not None and r.id != for_id :
+            if for_id is not None and r.ref_id != for_id :
                 matches = False
-            if shape_class is not None and r.shape.shape_type != shape_type :
+            if shape_type is not None and r.shape.shape_type != shape_type :
                 matches = False             
             if matches:
-                query_results[r.shape.id] = r
+                query_results[r.shape.sid] = r.shape
                 
         return query_results.values()
     
@@ -123,15 +123,15 @@ class ShapeLog(object):
     def all_faces(self):
         return self.query(shape_type=ShapeType.FACE)
         
-    def created_by_id(self,id):
-        return self.query(action_type=ActionType.CREATED,for_id=id)
+    def created_by_id(self,created_by_id):
+        return self.query(action_type=ActionType.CREATED,for_id=created_by_id)
         
-    def modified_by_id(self):
-        return self.query(action_type=ActionType.MODIFIED,for_id=id)
+    def modified_by_id(self,modified_by_id):
+        return self.query(action_type=ActionType.MODIFIED,for_id=modified_by_id)
         
 class ReferenceEntry(object):
-    def __init__(self,id,reference_type,action_type,shape):
-        self.id = id
+    def __init__(self,refid,reference_type,action_type,shape):
+        self.ref_id = refid
         self.reference_type = reference_type
         self.action_type = action_type
         self.shape = shape

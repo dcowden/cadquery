@@ -16,12 +16,12 @@
 """
 
 class Shape(object):
-    def __init(self,id):
-        self.id = id
-        self.shape_type = None
+    def __init__(self,shape_id,shape_type):
+        self.sid = shape_id
+        self.shape_type = shape_type
         
     def __hash__(self):
-        return self.id
+        return self.shape_id
     
     def center(self):
         raise NotImplementedError("Implement this Shape Method")
@@ -30,7 +30,7 @@ class Shape(object):
         return not self.__eq__(other)
 
     def __eq__(self, other):
-        return self.id == other.id 
+        return self.sid == other.sid 
 
 class ShapeType(object):
     FACE="FACE"

@@ -1,9 +1,9 @@
-from cadquery import Shape
+from cadquery import Shape,ShapeType
 
 class BaseCompound(Shape):
 
-    def __init__(self):
-        self.shape_type=ShapeType.COMPOUND
+    def __init__(self,compound_id):
+        Shape.__init__(shape_id,ShapeType.COMPOUND)
         
     def volume(self):
         raise NotImplementedError("Implement this Shape Method")
@@ -31,8 +31,8 @@ class BaseCompound(Shape):
         
 class BaseSolid(Shape):
 
-    def __init__(self):
-        self.shape_type=ShapeType.SOLID
+    def __init__(self,shape_id):
+        Shape.__init__(self,shape_id,ShapeType.SOLID)
 
     def volume(self):
         raise NotImplementedError("Implement this Shape Method")
@@ -57,8 +57,8 @@ class BaseSolid(Shape):
 
 class BaseShell(Shape):
 
-    def __init__(self):
-        self.shape_type=ShapeType.SHELL
+    def __init__(self,shell_id):
+        Shape.__init__(shape_id,ShapeType.SHELL)
         
     def volume(self):
         raise NotImplementedError("Implement this Shape Method")
@@ -85,7 +85,7 @@ class BaseShell(Shape):
 class BaseFace(Shape):
 
     def __init__(self):
-        self.shape_type=ShapeType.FACE
+        Shape.__init__(shape_id,ShapeType.FACE)
         
     def area(self):
         raise NotImplementedError("Implement this Shape Method")    
@@ -104,7 +104,7 @@ class BaseFace(Shape):
 class BaseWire(Shape):
 
     def __init__(self):
-        self.shape_type=ShapeType.WIRE
+        Shape.__init__(shape_id,ShapeType.WIRE)
         
     def length(self):
         raise NotImplementedError("Implement this Shape Method")    
@@ -121,7 +121,7 @@ class BaseWire(Shape):
 class BaseEdge(Shape):
 
     def __init__(self):
-        self.shape_type=ShapeType.EDGE
+        Shape.__init__(shape_id,ShapeType.EDGE)
         
     def length(self):
         raise NotImplementedError("Implement this Shape Method")    
@@ -135,5 +135,5 @@ class BaseEdge(Shape):
     
 class BaseVertex(Shape):
     def __init__(self):
-        self.shape_type=ShapeType.VERTEX
+        Shape.__init__(shape_id,ShapeType.VERTEX)
     pass

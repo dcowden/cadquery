@@ -82,9 +82,11 @@ if try_loading_pythonocc and ( not backend_loaded) :
         #top-level cadquery namespace.
         #i think we could use the imp tool to do what we want here and iterate 
         #over each one
+        #IMPORTANT!! order matters here. 
         from .pythonocc_impl.geom import *
-        from .pythonocc_impl.operations import *
         from .pythonocc_impl.shapes import *
+        from .pythonocc_impl.operations import *
+        
         log.warn("Found PythonOCC Backend")
         backend_loaded = True
        

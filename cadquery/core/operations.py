@@ -11,11 +11,12 @@
    See backend_base for a list of the Operations that a backend is expected to provide
    
 """
+from cadquery import ShapeLog
 
 class BaseOperation(object):
     def __init__(self,id):
         self.id = id
-        self.shape_history = ShapeHistory()
+        self.shape_log = ShapeLog()
         self.success = False
         self.result_message = None
         
@@ -24,7 +25,8 @@ class BaseOperation(object):
         self.result_message = message
         
     def perform(self):
-        r.set_result(False,"Not Implemented. Please subclass this and do some work")
+        r.set_result(False,"Not Implemented. Please subclass this. typically, this means create some geometry, add to shape_history, and set result")
+
 
         
 

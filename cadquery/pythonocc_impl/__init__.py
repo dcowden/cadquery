@@ -19,4 +19,7 @@
 
 import OCC
 
-__all__ = ["exporters","geom","importers","operations","shapes"]
+#be careful!
+#the order of import is important here, they have to be in 
+#dependency order
+__all__ = ["geom","shapes","operations","importers","exporters"]
