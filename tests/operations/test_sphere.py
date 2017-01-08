@@ -12,4 +12,4 @@ def test_simple_sphere():
 
     assert len(generated) == 1
     mysphere = generated[0]
-    #assert mysphere.volume() > 0
+    #assert mysphere.volume() > 0 

@@ -1,5 +1,6 @@
 from cadquery.impl_base.shapes import *
 
+from OCC.BRepGProp import 
 """
     Backend must implement each objects
 """
@@ -54,3 +55,7 @@ class Edge(BaseEdge):
 
 class Vertex(BaseVertex):
     pass
+
+
+
+def compute_volume(shape):
