@@ -1,6 +1,9 @@
 from cadquery import Shape,ShapeType
 
-class BaseCompound(Shape):
+
+HASH_BASE=787878
+
+class Compound(Shape):
 
     def __init__(self,compound_id):
         Shape.__init__(shape_id,ShapeType.COMPOUND)
@@ -29,10 +32,13 @@ class BaseCompound(Shape):
     def vertices(self):
         raise NotImplementedError("Implement this Shape Method")        
         
-class BaseSolid(Shape):
-
-    def __init__(self,shape_id):
+class Solid(Shape):
+        
+    def __init__(self, tds_solid):
+        shape_id = tds_solid.HashCode(HASH_BASE)
         Shape.__init__(self,shape_id,ShapeType.SOLID)
+        self.s = tds_solid
+
 
     def volume(self):
         raise NotImplementedError("Implement this Shape Method")
@@ -55,7 +61,7 @@ class BaseSolid(Shape):
     def vertices(self):
         raise NotImplementedError("Implement this Shape Method")        
 
-class BaseShell(Shape):
+class Shell(Shape):
 
     def __init__(self,shell_id):
         Shape.__init__(shape_id,ShapeType.SHELL)
@@ -82,7 +88,7 @@ class BaseShell(Shape):
         raise NotImplementedError("Implement this Shape Method")        
 
         
-class BaseFace(Shape):
+class Face(Shape):
 
     def __init__(self):
         Shape.__init__(shape_id,ShapeType.FACE)
@@ -101,7 +107,7 @@ class BaseFace(Shape):
     def vertices(self):
         raise NotImplementedError("Implement this Shape Method")        
         
-class BaseWire(Shape):
+class Wire(Shape):
 
     def __init__(self):
         Shape.__init__(shape_id,ShapeType.WIRE)
@@ -118,7 +124,7 @@ class BaseWire(Shape):
         raise NotImplementedError("Implement this Shape Method")        
 
     
-class BaseEdge(Shape):
+class Edge(Shape):
 
     def __init__(self):
         Shape.__init__(shape_id,ShapeType.EDGE)
@@ -133,7 +139,7 @@ class BaseEdge(Shape):
         raise NotImplementedError("Implement this Shape Method")        
 
     
-class BaseVertex(Shape):
+class Vertex(Shape):
     def __init__(self):
         Shape.__init__(shape_id,ShapeType.VERTEX)
     pass

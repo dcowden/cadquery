@@ -1,4 +1,4 @@
-class BaseExporter(object):    
+class Exporter(object):    
     
     def export_svg(self,shape, stream, output_options=None):
         raise NotImplementedError("Please write SVG for the given shape to the stream")

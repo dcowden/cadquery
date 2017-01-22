@@ -6,10 +6,12 @@ from cadquery import ShapeLog,ReferenceType,ActionType
 #if we use the real backedn, we'll have to create real solids,
 #which is not useful here
 
-from cadquery import BaseSolid
-class TestSolid(BaseSolid):
+from cadquery import Shape,ShapeType
+
+class TestSolid(Shape):
     def __init__(self,solid_id):
-        BaseSolid.__init__(self,solid_id)
+        Shape.__init__(self,solid_id,ShapeType.SOLID)
+        self.s = None
 
 
 def test_create():

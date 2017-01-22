@@ -1,23 +1,32 @@
 import math
 from cadquery import Configuration
-
+from OCC.gp import gp_Vec,gp_Trsf,gp_Pnt
 """
     Base objects. Designed to be immutable, and implemented as a part of a backend
 
 """
-class BaseVector(object):
+class Vector(object):
     
-    def __init__(self,x, y, z):
-        pass
-      
+    def __init__(self,x,y,z):
+        self.v = gp_Vec(x,y,z)
+                
     def X(self):
-        raise NotImplementedError("Please Implement this Vector Method")
+        return self.v.X()
 
     def Y(self):
-        raise NotImplementedError("Please Implement this Vector Method")
+        return self.v.Y()
 
     def Z(self):
-        raise NotImplementedError("Please Implement this Vector Method")
+        return self.v.Z()
+
+    def distance(self,other):
+        p1 = gp_Pnt(self.v.X(), self.v.Y(), self.v.Z())
+        p2 = gp_Pnt(other.v.X(), other.v.Y(), other.v.Z())
+        return p1.Distance(p2)
+        
+    def cross(self,another_vector):
+        c = self.v.Crossed(another_vector.v)
+        return  Vector(c.X(),c.Y(),c.Z())
 
     def angle(self,another_vector):
         raise NotImplementedError("Please Implement this Vector Method")        
@@ -46,8 +55,6 @@ class BaseVector(object):
     def scale(self,scale):
         raise NotImplementedError("Please Implement this Vector Method") 
     
-    def distance(self,other):
-        raise NotImplementedError("Please implement this Vector Method")
         
     def tolerant_equals(self,other):
         return self.distance(other) < Configuration.TOLERANCE
@@ -62,7 +69,7 @@ class BaseVector(object):
 
     
 
-class BaseAxis(object):
+class Axis(object):
     """
         An axis contains two vectors-- a point and a direction
     """
@@ -77,12 +84,12 @@ class BaseAxis(object):
         raise NotImplementedError("please return a vector that represents the origin of this axis")
         
     
-class BaseTransformation(object):
+class Transformation(object):
     
     # base constructor should create an identity transformation
     # ( no scale, no rotation, no translation)
     def __init__(self):
-        pass
+        self.m = gp_Trsf()
     
     def with_values(tuple_of_tuple_4x4):
          raise NotImplementedError("Please implment this Transformation Method")
@@ -112,7 +119,7 @@ class BaseTransformation(object):
         raise NotImplementedError("Please implment this Transformation Method") 
 
 
-class BaseBoundingBox(object):
+class BoundingBox(object):
     
     """ A bounding Box. Initial constructor should create an empty one"""
     def __init__(self):

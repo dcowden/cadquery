@@ -1,5 +1,5 @@
 
-class BaseImporter(object):
+class Importer(object):
 
     def import_binary(self,stream):
         raise NotImplementedError("Please return a shape by reading a proprietry binary format from the stream")
