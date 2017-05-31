@@ -2421,6 +2421,9 @@ class Workplane(CQ):
 
             return Solid.makeBox(length, width, height, Vector(xp, yp, zp))
 
+        if type(length) is tuple or type(length) is list:
+            length,width,height = length[0],length[1],length[2]
+
         boxes = self.eachpoint(_makebox, True)
 
         #if combination is not desired, just return the created boxes
