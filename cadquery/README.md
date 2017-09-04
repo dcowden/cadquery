@@ -19,27 +19,20 @@ Module descriptions:
 	* importer: import routines
 	* operations: base classes for modellig operations and their results
 	* selectors: cq selectors
-	* shapes: base shape object definitions
-	
- * impl_base -- Base classes that implementations must extend
+	* shapes: base shape object definitions 
+ * impl -- python OCC implementation
  
-    * geom: base geometric contstructs, Transforms, Vectors, BoundingBox, Planes
-	* exporters: export routines
-	* importers: import routines
-	* operations: modelling functions that actually do work
-	* shapes: the list of shapes backends must implement: Face, Wire, Edge, Vertex, Solid, etc
+Thoughts On How Things should work
+=======================
 
-The implementation packages generally have an implementation module correspdonding directly to each 
-module in impl_base.
-	
- * freecad_impl -- FreeCAD implementation classes ( these extend backend_base )
- * pythonocc_impl -- PythonOCC implementation classes ( these extend backend_base )
- 
- 
- Creating a Backend
- ====================
- 
- init.py of a backend should load the necessary dependencies of the framework, and raise
- an error if they are not available
- 
+ 1. queries are the key to robust handling of geometry that changes
+ 2. users want to use variables not queries
+ 3. a single modeling context is a reqiurement
+ 4. users dont want to deal with the context
+ 5. the direct api needs to deal with queries and contexts-- there is no avoiding it
+
+Questions
+-----------
+
+
 
