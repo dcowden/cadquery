@@ -127,38 +127,7 @@ Direct API Example
     assert chamfered_hole != box_with_hole
     assert chamfered_hole.solids().first() != box_with_hole.solids().first()
     assert len(chamfered_hole.faces() == 9
-    
-More about What the Direct API is doing
-=========================================
-
-Consider a cut operation, which accepts two Solids:
-
-    cut = Cut_Operation(solid1=some_solid, solid2=another_solid)
-    cut.perform()
-    shape_log = cut.shape_log
-
-The shape_log gives a list of all of the topology items that were created, modifed, or destroyed in the operation.
-
-The direct api exposes this operation by providing a method which expects queries, and returns a query, for example
-
-    def cut( source_query, tools_query):
-
-        shape_log = self.context.shape_log
-
-        operation_id = self.id_generator.newId()
-
-        #get a single source solid to subtract from
-        source_solid = source_query.solids().first().evaluate()
-
-        #get a list of tool solids
-        tool_solids = source_query.solids().evaluate()
-
-        for tool in tool_solids:
-            cut = Cut_Operation(solid1=source_solid, solid2=tool)
-            cut.perform()
-
-            #merge information about what objects were modified into the tree.
-            #this is how we track the magic of what objects became what.            
+        
             shape_log.merge(cut.shape_log)    
         
         #return a query that can be used to select any shapes created, modified, or deleted by this operation
