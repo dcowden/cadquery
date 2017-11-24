@@ -3,6 +3,8 @@
 This folder has some working, but not integrated with CQ
 code that can import/read dxfs.
 
+Reference: https://github.com/dcowden/cadquery/issues/173
+
 ## Overview
 This code will read a DXF, and clean it up in the process.
 
@@ -38,4 +40,4 @@ This code reads a dxf, and reads it into an entity map that is ready to be used 
   * upgrade to latest networkx ( i think they are at 2.0)
   * add dxf profiles directory to put lots of common profiles
   * add tests to the examples to ensure the new dxfs work right
-  
+  * move this code out this folder, into the right places, and delete this folder eventually
