@@ -35,9 +35,16 @@ This code reads a dxf, and reads it into an entity map that is ready to be used 
       * recenter=true/false-- this decides whether to shift the sktch to the origin( supported already by entitymap)
       * center point for the import ( default to center of the sketch)
       * layer number ( so user can select which layer to read in the dxf, default=0)
+      * point tolerance to identify points that are really supposed to be the same
   * convert the entity map into the cq commands to add to the sketch.
   * delete vec2d.py and implmenet in terms of existing cq vector classes ( this is from a separate project where i didnt have vector code available )
   * upgrade to latest networkx ( i think they are at 2.0)
   * add dxf profiles directory to put lots of common profiles
   * add tests to the examples to ensure the new dxfs work right
   * move this code out this folder, into the right places, and delete this folder eventually
+
+## limitations of the current code
+
+  * doesnt handle splines
+  * can only read from a single layer
+  * generates in-memory entites that are designed to generate arcTo or LWPOLYLINE commands, which use arc endpoints instead of center point
