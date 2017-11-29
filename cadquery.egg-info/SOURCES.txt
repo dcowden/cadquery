@@ -1,4 +1,5 @@
 MANIFEST.in
+README.md
 README.txt
 setup.cfg
 setup.py
@@ -11,9 +12,11 @@ cadquery.egg-info/PKG-INFO
 cadquery.egg-info/SOURCES.txt
 cadquery.egg-info/dependency_links.txt
 cadquery.egg-info/not-zip-safe
+cadquery.egg-info/requires.txt
 cadquery.egg-info/top_level.txt
 cadquery/contrib/__init__.py
 cadquery/freecad_impl/__init__.py
+cadquery/freecad_impl/console_logging.py
 cadquery/freecad_impl/exporters.py
 cadquery/freecad_impl/geom.py
 cadquery/freecad_impl/importers.py
@@ -25,5 +28,6 @@ tests/TestCadObjects.py
 tests/TestCadQuery.py
 tests/TestExporters.py
 tests/TestImporters.py
+tests/TestLogging.py
 tests/TestWorkplanes.py
 tests/__init__.py

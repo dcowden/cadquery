@@ -78,7 +78,7 @@ def compute_arc_points(center_point_tuple, radius, startAngle, endAngle ):
 def import_drawing(filePath ,function_name="make_shape",reCenter=True):
 	"""
 		Creates a featurescript version of a DXF.
-		We
+
 		There are a few requirements
 			Use a little space as possible
 			check points to avoid non-closed curves.

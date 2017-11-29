@@ -164,7 +164,7 @@ class EntityMap(object):
 		d = math.hypot(point2[0] - point1[0], point2[1] - point1[1] )
 		return d < self.tolerance
 
-	def centered (self ):
+	def centered (self):
 		"""
 			returns a version of this map transformed so that it is centered around the origin.
 			TODO: it would really be better to use the underlying
@@ -253,3 +253,4 @@ if __name__ == '__main__':
 	testMapWithDanglingEdges()
 	testTwoLoops()
 	testCentering()
+	

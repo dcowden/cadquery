@@ -1,5 +1,10 @@
 build/
 *.pyc
+*.bak
+*.step
+*.STEP
+*.stp
+*.STP
 doc/_build/*
 dist/*
 .idea/*
