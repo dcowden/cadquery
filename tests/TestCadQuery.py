@@ -773,6 +773,14 @@ class TestCadQuery(BaseTest):
                           r.vertices(selectors.NearestToPointSelector((0.0, 0.0, 0.0)))\
                           .first().val().Y))
 
+    def testDxf(self):
+        """
+        Test import of a DXF drawing to 2D objects on a workplane
+        """
+        s = Workplane(Plane.XY())
+        r = s.dxf('cadquery/plugins/dxf/tests/1515-ULS.dxf').extrude(5)
+        self.assertEqual(194, r.faces().size())
+
     def testLargestDimension(self):
         """
         Tests the largestDimension function when no solids are on the stack and when there are

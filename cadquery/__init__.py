@@ -10,7 +10,6 @@ from .freecad_impl import importers
 from .selectors import *
 from .cq import *
 
-
 __all__ = [
     'CQ','Workplane','plugins','selectors','Plane','BoundBox','Matrix','Vector','sortWiresByBuildOrder',
     'Shape','Vertex','Edge','Wire','Face','Solid','Shell','Compound','exporters', 'importers',
