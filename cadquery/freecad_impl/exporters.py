@@ -1,4 +1,4 @@
-from __future__ import unicode_literals 
+from __future__ import unicode_literals
 
 import cadquery
 
@@ -161,7 +161,7 @@ class AmfWriter(object):
             v3 = ET.SubElement(triangle,'v3')
             v3.text = str(t[2])
 
-        ET.ElementTree(amf).write(outFile,encoding="unicode",xml_declaration=True)
+        ET.ElementTree(amf).write(outFile,xml_declaration=True)
 
 """
     Objects that represent
