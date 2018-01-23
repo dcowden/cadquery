@@ -12,7 +12,7 @@ from tests import BaseTest
 
 class TestStringIO(io.StringIO):
     def write(self, content):
-        # force unicode encoding
+        # force unicode encoding.
         #
         # Justification:
         #   StringIO is being used in place of file descriptors,
