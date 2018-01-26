@@ -5,3 +5,4 @@ coverage
 coveralls
 pyparsing
 mock
+ezdxf
