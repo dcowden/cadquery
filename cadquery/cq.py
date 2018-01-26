@@ -26,6 +26,8 @@ from cadquery import exporters
 from .plugins.dxf import read_dxf as rd
 from .plugins.dxf.pointmap import *
 
+from copy import copy, deepcopy
+
 
 class CQContext(object):
     """
@@ -78,7 +80,7 @@ class CQ(object):
         Custom plugins and subclasses should use this method to create new CQ objects
         correctly.
         """
-        r = CQ(None)  # create a completely blank one
+        r = type(self)(None)  # create a completely blank one
         r.parent = self
         r.ctx = self.ctx  # context solid remains the same
         r.objects = list(objlist)
@@ -748,7 +750,7 @@ class CQ(object):
     def mirror(self, mirrorPlane="XY", basePointVector=(0, 0, 0)):
         """
         Mirror a single CQ object. This operation is the same as in the FreeCAD PartWB's mirroring
-    
+
         :param mirrorPlane: the plane to mirror about
         :type mirrorPlane: string, one of "XY", "YX", "XZ", "ZX", "YZ", "ZY" the planes
         :param basePointVector: the base point to mirror about
@@ -885,6 +887,12 @@ class CQ(object):
         solid.wrapped = s.wrapped
         return self.newObject([s])
 
+    def __copy__(self):
+        return self.newObject(copy(self.objects))
+
+    def __deepcopy__(self, memo):
+        return self.newObject(deepcopy(self.objects, memo))
+
 
 class Workplane(CQ):
     """
@@ -994,7 +1002,7 @@ class Workplane(CQ):
         """
 
         #copy the current state to the new object
-        ns = Workplane("XY")
+        ns = type(self)("XY")
         ns.plane = self.plane
         ns.parent = self
         ns.objects = list(objlist)
