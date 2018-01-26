@@ -3,6 +3,8 @@ from .freecad_impl.geom import Plane,BoundBox,Vector,Matrix,sortWiresByBuildOrde
 from .freecad_impl.shapes import Shape,Vertex,Edge,Face,Wire,Solid,Shell,Compound
 from .freecad_impl import exporters
 from .freecad_impl import importers
+from .dxf_impl import read_dxf
+from .dxf_impl import pointmap
 
 #these items are the common implementation
 
