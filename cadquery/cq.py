@@ -22,10 +22,7 @@ import math
 from cadquery import *
 from cadquery import selectors
 from cadquery import exporters
-# imports for DXF import. Unsure if this is correct place to add
-# from .plugins.dxf import read_dxf as rd
-# from .plugins.dxf.pointmap import *
-from cadquery import read_dxf as rd
+from cadquery import read_dxf
 from cadquery import pointmap
 
 from copy import copy, deepcopy
@@ -1733,7 +1730,7 @@ class Workplane(CQ):
         """
 
         # Our list of new edges that will go into a new CQ object
-        dwg = rd.import_drawing(src)
+        dwg = read_dxf.import_drawing(src)
 
         def _findWindDirection(loop):
             score = 0

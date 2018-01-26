@@ -1,5 +1,6 @@
 from tests import BaseTest
 from cadquery.dxf_impl.vec2d import Vec2d
+from cadquery.dxf_impl.read_dxf import compute_arc_midpoint
 import pickle
 
 ####################################################################
@@ -112,3 +113,34 @@ class TestVec2D(BaseTest):
         testvec_str = pickle.dumps(testvec)
         loaded_vec = pickle.loads(testvec_str)
         self.assertEquals(testvec, loaded_vec)
+
+    def test_arc_midpoint(self):
+        point1= [ 0.0, 0.0, 0, 0, 1.0 ]
+        point2 = [1.0,0.0,0,0,0 ]
+        r = compute_arc_midpoint(point1,point2)
+        assert r == (0.5,-0.5)
+
+        point1= [0,0,0,0,1.0]
+        point2= [0,1.0,0,0,0]
+        assert compute_arc_midpoint(point1,point2) == ( 0.5,0.5)
+
+        point1= [-1.0,0,0,0,-0.5]
+        point2= [1.0,0,0,0,0]
+        #print compute_arc_midpoint(point1,point2)
+        assert compute_arc_midpoint(point1,point2) == ( 0,0.5)
+
+        point1= [-1.0,-1.0,0,0,1.0]
+        point2= [1.0,1.0,0,0,0]
+        #print compute_arc_midpoint(point1,point2)
+        assert compute_arc_midpoint(point1,point2) == ( 1.0,-1.0)
+
+        point1= [0.544,2.559,0,0,0.36397 ]
+        point2= [0.232,2.188,0,0,0]
+        m = compute_arc_midpoint(point1,point2)
+        print (m)
+
+
+        point1= [1.676,-2.759,0,0,1.0]
+        point2= [1.785,-2.889,0,0,0]
+        #//"start": vector(1.785,-2.889) * inch, "mid": vector(1.707,1.707) * inch, "end": vector(1.676,-2.759)
+        assert (1.6655, -2.8785) ==  compute_arc_midpoint(point1,point2)

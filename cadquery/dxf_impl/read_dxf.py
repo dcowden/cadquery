@@ -1,6 +1,4 @@
-from __future__ import print_function
 import ezdxf
-import pprint
 import sys
 import logging
 from pointmap import EntityMap
@@ -41,10 +39,6 @@ DXF_UNIT_XREF={
 	6: 'm',
 	7: 'km'
 }
-
-def eprint(*args, **kwargs):
-	print(*args, file=sys.stderr, **kwargs)
-
 
 def compute_arc_points(center_point_tuple, radius, startAngle, endAngle ):
 	#given center point, radius, and start/end angles, produce
@@ -101,15 +95,10 @@ def import_drawing(filePath ,function_name="make_shape",reCenter=True):
 			entityMap.line(point1[:2],point2[:2])
 
 	for entity in m:
-		#log.debug("Layer= '%s'" % entity.dxf.layer )
-		#if entity.dxf.layer == '0':
-		#	#log.debug("Skipping Layer 1 Entitiy")
-		#	continue;
 		if entity.dxftype() == 'LWPOLYLINE':
 
 			points = list(entity.get_points())
 			for idx,point in enumerate(points[:-1]):
-				#print ("current idx=%d, nextidx=%d" % (idx, idx+1))
 				nextpoint = points[idx+1]
 				makePolyLine(point,nextpoint)
 
@@ -159,42 +148,3 @@ def compute_arc_midpoint(point1, point2 ):
 	arcpoint = midpoint + (radius)* perp
 	log.debug ( "Distance=%s,Radius=%s,Midpoint=%s,perp=%s,bulge=%s,arcpoint=%s" %  ( str(distance), str(radius), str(midpoint), str(perp), str(bulge) , str(arcpoint) )  )
 	return ( arcpoint.x, arcpoint.y )
-
-def test_arc_midpoint():
-	point1= [ 0.0, 0.0, 0, 0, 1.0 ]
-	point2 = [1.0,0.0,0,0,0 ]
-	r = compute_arc_midpoint(point1,point2)
-	assert r == (0.5,-0.5)
-
-	point1= [0,0,0,0,1.0]
-	point2= [0,1.0,0,0,0]
-	assert compute_arc_midpoint(point1,point2) == ( 0.5,0.5)
-
-	point1= [-1.0,0,0,0,-0.5]
-	point2= [1.0,0,0,0,0]
-	#print compute_arc_midpoint(point1,point2)
-	assert compute_arc_midpoint(point1,point2) == ( 0,0.5)
-
-	point1= [-1.0,-1.0,0,0,1.0]
-	point2= [1.0,1.0,0,0,0]
-	#print compute_arc_midpoint(point1,point2)
-	assert compute_arc_midpoint(point1,point2) == ( 1.0,-1.0)
-
-	point1= [0.544,2.559,0,0,0.36397 ]
-	point2= [0.232,2.188,0,0,0]
-	m = compute_arc_midpoint(point1,point2)
-	print (m)
-
-
-	point1= [1.676,-2.759,0,0,1.0]
-	point2= [1.785,-2.889,0,0,0]
-	#//"start": vector(1.785,-2.889) * inch, "mid": vector(1.707,1.707) * inch, "end": vector(1.676,-2.759)
-	assert (1.6655, -2.8785) ==  compute_arc_midpoint(point1,point2)
-
-if __name__ == '__main__':
-
-	logging.basicConfig(level=logging.INFO)
-	map1 = import_drawing('tests/1515-ULS.dxf')
-	print(map1)
-	map2 = import_drawing('tests/ST3X6.25.DXF')
-	print(map2)
