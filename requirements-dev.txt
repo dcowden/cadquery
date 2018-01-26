@@ -5,4 +5,5 @@ coverage
 coveralls
 pyparsing
 mock
-ezdxf
+networkx==1.11
+ezdxf==0.8.2

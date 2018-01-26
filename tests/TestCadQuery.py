@@ -792,7 +792,7 @@ class TestCadQuery(BaseTest):
         Test import of a DXF drawing to 2D objects on a workplane
         """
         s = Workplane(Plane.XY())
-        r = s.dxf('cadquery/plugins/dxf/tests/1515-ULS.dxf').extrude(5)
+        r = s.dxf('cadquery/dxf_impl/tests/1515-ULS.dxf').extrude(5)
         self.assertEqual(194, r.faces().size())
 
     def testLargestDimension(self):
