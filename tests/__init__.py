@@ -61,6 +61,7 @@ __all__ = [
     'TestCadQuery',
     'TestExporters',
     'TestImporters',
+    'TestVec2D',
     'TestLogging',
     'TestWorkplanes',
 ]

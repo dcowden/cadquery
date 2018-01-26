@@ -1,30 +1,16 @@
 from __future__ import print_function
 import ezdxf
-#import math
-#import os
-#import os.path
-#import copy
-#from datetime import datetime
 import pprint
-#import traceback
 import sys
 import logging
-#import json
-#import collections
-#import time
-
-
-#from lookuptable_template import LOOKUP_TABLE_TEMPLATE
-from prettyprint import prettyPrintMap, natsorted
 from pointmap import EntityMap
 from vec2d import Vec2d
-
 
 log = logging.getLogger('generate')
 #
 # Reads a DXF, and creates Onshape FS code that will produce that value.
 # DXF import in Onshape is really horrible!
-#
+#z
 
 #TODO: factor out precision. very important to eliminate rounding error!
 

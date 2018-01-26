@@ -17,5 +17,6 @@ suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCQSelectors.TestC
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCadQuery.TestCadQuery))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestExporters.TestExporters))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestImporters.TestImporters))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestVec2D.TestVec2D))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestLogging.TestLogging))
 unittest.TextTestRunner().run(suite)
