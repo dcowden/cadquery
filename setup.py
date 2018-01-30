@@ -31,7 +31,7 @@ setup(
     description='CadQuery is a parametric  scripting language for creating and traversing CAD models',
     long_description=open('README.md').read(),
     packages=['cadquery','cadquery.contrib','cadquery.freecad_impl','cadquery.plugins','cadquery.freecad_impl','cadquery.dxf_impl' ,'tests'],
-    install_requires=['pyparsing'],
+    install_requires=['pyparsing', 'ezdxf', 'networkx'],
     include_package_data=True,
     zip_safe=False,
     platforms='any',
