@@ -1,5 +1,10 @@
 from __future__ import unicode_literals 
 
+import sys
+
+if sys.version_info[0] == 3:
+    from past import unicode
+
 import cadquery
 
 import FreeCAD
@@ -96,9 +101,9 @@ def readAndDeleteFile(fileName):
         read data from file provided, and delete it when done
         return the contents as a string
     """
-    res = ""
+    res = ''
     with open(fileName,'r') as f:
-        res = f.read()
+       res = unicode(f.read())
 
     os.remove(fileName)
     return res
@@ -145,23 +150,23 @@ class AmfWriter(object):
             vtx = ET.SubElement(vertices,'vertex')
             coord = ET.SubElement(vtx,'coordinates')
             x = ET.SubElement(coord,'x')
-            x.text = str(v.x)
+            x.text = unicode(v.x)
             y = ET.SubElement(coord,'y')
-            y.text = str(v.y)
+            y.text = unicode(v.y)
             z = ET.SubElement(coord,'z')
-            z.text = str(v.z)
+            z.text = unicode(v.z)
 
         #add triangles
         for t in self.tessellation[1]:
             triangle = ET.SubElement(volume,'triangle')
             v1 = ET.SubElement(triangle,'v1')
-            v1.text = str(t[0])
+            v1.text = unicode(t[0])
             v2 = ET.SubElement(triangle,'v2')
-            v2.text = str(t[1])
+            v2.text = unicode(t[1])
             v3 = ET.SubElement(triangle,'v3')
-            v3.text = str(t[2])
+            v3.text = unicode(t[2])
 
-        ET.ElementTree(amf).write(outFile,encoding="unicode",xml_declaration=True)
+        ET.ElementTree(amf).write(outFile, encoding='utf-8', xml_declaration=True)
 
 """
     Objects that represent
@@ -170,21 +175,20 @@ class AmfWriter(object):
 """
 class JsonMesh(object):
     def __init__(self):
+        self.vertices = []
+        self.faces = []
+        self.nVertices = 0
+        self.nFaces = 0
 
-        self.vertices = [];
-        self.faces = [];
-        self.nVertices = 0;
-        self.nFaces = 0;
-
-    def addVertex(self,x,y,z):
-        self.nVertices += 1;
-        self.vertices.extend([x,y,z]);
+    def addVertex(self, x, y, z):
+        self.nVertices += 1
+        self.vertices.extend([x, y, z])
 
     #add triangle composed of the three provided vertex indices
-    def addTriangleFace(self, i,j,k):
+    def addTriangleFace(self, i, j, k):
         #first position means justa simple triangle
-        self.nFaces += 1;
-        self.faces.extend([0,int(i),int(j),int(k)]);
+        self.nFaces += 1
+        self.faces.extend([0, int(i), int(j), int(k)])
 
     """
         Get a json model from this model.
@@ -192,11 +196,11 @@ class JsonMesh(object):
     """
     def toJson(self):
         return JSON_TEMPLATE % {
-            'vertices' : str(self.vertices),
-            'faces' : str(self.faces),
+            'vertices': unicode(self.vertices),
+            'faces': unicode(self.faces),
             'nVertices': self.nVertices,
-            'nFaces' : self.nFaces
-        };
+            'nFaces': self.nFaces,
+        }
 
 
 def getPaths(freeCadSVG):
@@ -283,16 +287,16 @@ def getSVG(shape,opts=None):
 
     svg =  SVG_TEMPLATE % (
         {
-            "unitScale" : str(unitScale),
-            "strokeWidth" : str(1.0/unitScale),
-            "hiddenContent" :  hiddenContent ,
-            "visibleContent" :visibleContent,
-            "xTranslate" : str(xTranslate),
-            "yTranslate" : str(yTranslate),
-            "width" : str(width),
-            "height" : str(height),
-            "textboxY" :str(height - 30),
-            "uom" : str(uom)
+            'unitScale': unicode(unitScale),
+            'strokeWidth': unicode(1.0 / unitScale),
+            'hiddenContent':  hiddenContent,
+            'visibleContent':visibleContent,
+            'xTranslate': unicode(xTranslate),
+            'yTranslate': unicode(yTranslate),
+            'width': unicode(width),
+            'height': unicode(height),
+            'textboxY': unicode(height - 30),
+            'uom' : unicode(uom)
         }
     )
     #svg = SVG_TEMPLATE % (
