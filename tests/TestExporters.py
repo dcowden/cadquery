@@ -1,6 +1,8 @@
 """
     Tests basic workplane functionality
 """
+from __future__ import unicode_literals
+
 #core modules
 import io
 
@@ -24,7 +26,7 @@ class TestExporters(BaseTest):
         result = s.getvalue()
         #print result
         for q in stringsToFind:
-            self.assertTrue(result.find(q) > -1 )
+            self.assertTrue(q in result)
         return result
 
     def testSTL(self):
