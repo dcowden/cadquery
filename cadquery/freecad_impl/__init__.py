@@ -18,6 +18,7 @@
 """
 import os
 import sys
+import glob
 
 
 #FreeCAD has crudified the stdout stream with a bunch of STEP output
@@ -59,6 +60,13 @@ def _fc_path():
     _PATH = os.environ.get('FREECAD_LIB', '')
     if _PATH and os.path.exists(_PATH):
         return _PATH
+
+    # Try to guess if using Anaconda
+    if 'env' in sys.prefix:
+        _PATH = os.path.join(sys.prefix,'lib')
+        # return PATH if FreeCAD.[so,pyd] is present
+        if len(glob.glob(os.path.join(_PATH,'FreeCAD.*'))) > 0:
+            return _PATH
 
     if sys.platform.startswith('linux'):
         # Make some dangerous assumptions...
