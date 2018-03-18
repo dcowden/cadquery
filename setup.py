@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import codecs
 from setuptools import setup
 
 
@@ -29,7 +30,7 @@ setup(
     author='David Cowden',
     author_email='dave.cowden@gmail.com',
     description='CadQuery is a parametric  scripting language for creating and traversing CAD models',
-    long_description=open('README.md', encoding='UTF-8').read(),
+    long_description=codecs.open('README.md', 'rb', 'UTF-8').read()
     packages=['cadquery','cadquery.contrib','cadquery.freecad_impl','cadquery.plugins','tests'],
     install_requires=['pyparsing'],
     include_package_data=True,
