@@ -9,7 +9,7 @@ install:
     - set "PATH=%MINICONDA_DIRNAME%;%MINICONDA_DIRNAME%\\Scripts;%PATH%"
     - conda config --set always_yes yes
     - conda update -q conda
-    - conda create --quiet --name cqtest -c freecad -c conda-forge python=%PYTHON_VERSION% freecad=0.17=py36_11 occt=7.2.0=occt7.2.0_vc14_0 python=3.6 pyparsing conda mock
+    - conda create --quiet --name cqtest -c freecad -c conda-forge python=%PYTHON_VERSION% freecad=0.17=py36_11 occt=7.2.0 python=3.6 pyparsing conda mock
     - activate cqtest
     - python setup.py install
 
