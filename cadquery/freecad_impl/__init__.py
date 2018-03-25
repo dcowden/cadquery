@@ -63,10 +63,16 @@ def _fc_path():
 
     # Try to guess if using Anaconda
     if 'env' in sys.prefix:
-        _PATH = os.path.join(sys.prefix,'lib')
-        # return PATH if FreeCAD.[so,pyd] is present
-        if len(glob.glob(os.path.join(_PATH,'FreeCAD.*'))) > 0:
-            return _PATH
+        if sys.platform.startswith('linux'):
+            _PATH = os.path.join(sys.prefix,'lib')
+            # return PATH if FreeCAD.[so,pyd] is present
+            if len(glob.glob(os.path.join(_PATH,'FreeCAD.so'))) > 0:
+                return _PATH
+        elif sys.platform.startswith('win'):
+            _PATH = os.path.join(sys.prefix,'Library','bin')
+            # return PATH if FreeCAD.[so,pyd] is present
+            if len(glob.glob(os.path.join(_PATH,'FreeCAD.pyd'))) > 0:
+                return _PATH
 
     if sys.platform.startswith('linux'):
         # Make some dangerous assumptions...
