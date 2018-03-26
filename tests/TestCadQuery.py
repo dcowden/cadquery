@@ -3,7 +3,7 @@
 
 """
 #system modules
-import math,sys,os.path,time
+import math,os.path,time,tempfile
 
 #my modules
 from cadquery import *
@@ -19,11 +19,7 @@ from tests import (
 from cadquery.freecad_impl import suppress_stdout_stderr
 
 #where unit test output will be saved
-import sys
-if sys.platform.startswith("win"):
-    OUTDIR = "c:/temp"
-else:
-    OUTDIR = "/tmp"
+OUTDIR = tempfile.gettempdir()
 SUMMARY_FILE = os.path.join(OUTDIR,"testSummary.html")
 
 SUMMARY_TEMPLATE="""<html>

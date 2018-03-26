@@ -2,7 +2,7 @@
     Tests file importers such as STEP
 """
 #core modules
-import io
+import tempfile
 
 from cadquery import *
 from cadquery import exporters
@@ -11,12 +11,7 @@ from cadquery.freecad_impl import suppress_stdout_stderr
 from tests import BaseTest
 
 #where unit test output will be saved
-import sys
-if sys.platform.startswith("win"):
-    OUTDIR = "c:/temp"
-else:
-    OUTDIR = "/tmp"
-
+OUTDIR = tempfile.gettempdir()
 
 class TestImporters(BaseTest):
     def importBox(self, importType, fileName):
