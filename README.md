@@ -6,6 +6,7 @@ What is a CadQuery?
 ========================================
 
 [![Travis Build Status](https://travis-ci.org/dcowden/cadquery.svg?branch=master)](https://travis-ci.org/dcowden/cadquery?branch=master)
+[![Build status](https://ci.appveyor.com/api/projects/status/c7u4yjl8xxlokrw0/branch/master?svg=true)](https://ci.appveyor.com/project/jmwright/cadquery/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/dcowden/cadquery/badge.svg?branch=master)](https://coveralls.io/github/dcowden/cadquery?branch=master)
 [![GitHub version](https://d25lcipzij17d.cloudfront.net/badge.svg?id=gh&type=6&v=1.1.0&x2=0)](https://github.com/dcowden/cadquery/releases/tag/v1.1.0)
 [![License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://github.com/dcowden/cadquery/blob/master/LICENSE)
