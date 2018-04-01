@@ -1,3 +1,8 @@
 [run]
 branch = True
 include = cadquery/*
+omit = cadquery/cq_directive.py
+
+
+[xml]
+output = coverage.xml

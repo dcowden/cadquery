@@ -19,7 +19,8 @@ install:
 build: false
 
 test_script:
-    -  runtests.py
+    - coverage run runtests.py
 
 on_success:
+    - coverage xml
     - codecov
