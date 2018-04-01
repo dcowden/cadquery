@@ -23,4 +23,4 @@ test_script:
 
 on_success:
     - coverage xml
-    - codecov
+    - codecov --file coverage.xml
