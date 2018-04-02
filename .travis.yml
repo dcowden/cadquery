@@ -14,7 +14,7 @@ before_install:
     conda config --set always_yes yes --set changeps1 no;
     conda update -q conda;
     conda info -a;
-    conda create -y -q -n freecad_cq3 -c freecad -c conda-forge freecad=0.17=py36_11 occt=7.2.0=occt7.2.0_0 python=3.6 pyparsing conda mock;
+    conda create -y -q -n freecad_cq3 -c freecad -c conda-forge freecad=0.17=py36_11 occt=7.2.0=occt7.2.0_0 python=3.6 pyparsing conda mock coverage codecov;
     source ~/miniconda/bin/activate freecad_cq3;
   else
     sudo add-apt-repository -y ppa:freecad-maintainers/freecad-stable;
@@ -29,11 +29,14 @@ install:
 - python setup.py install;
 
 script:
+- coverage run runtests.py
 - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-    coverage run --source=cadquery --omit=cadquery/cq_directive.py ./runtests.py;
     travis-sphinx build --nowarn --source=doc;
   fi
-- python runtests.py
+
+after_success:
+- coverage xml
+- codecov -X gcov --file coverage.xml
 
 after_script:
 - coveralls
@@ -43,6 +46,7 @@ branches:
   except:
   - pythonocc
   - 2_0_branch
+
 deploy:
   provider: pypi
   user: dcowden
