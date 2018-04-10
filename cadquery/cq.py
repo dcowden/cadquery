@@ -2073,17 +2073,20 @@ class Workplane(CQ):
         if clean: newS = newS.clean()
         return newS
 
-    def sweep(self, path, makeSolid=True, isFrenet=False, combine=True, clean=True):
+    def sweep(self, path, sweepAlongWires=False, makeSolid=True, isFrenet=False, combine=True, clean=True):
         """
         Use all un-extruded wires in the parent chain to create a swept solid.
 
         :param path: A wire along which the pending wires will be swept
+        :param boolean sweepAlongWires:
+            False to create mutliple swept from wires on the chain along path
+            True to create only one solid swept along path with shape following the list of wires on the chain 
         :param boolean combine: True to combine the resulting solid with parent solids if found.
         :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
         :return: a CQ object with the resulting solid selected.
         """
 
-        r = self._sweep(path.wire(), makeSolid, isFrenet)  # returns a Solid (or a compound if there were multiple)
+        r = self._sweep(path.wire(), sweepAlongWires, makeSolid, isFrenet)  # returns a Solid (or a compound if there were multiple)
         if combine:
             newS = self._combineWithBase(r)
         else:
@@ -2397,11 +2400,14 @@ class Workplane(CQ):
 
         return Compound.makeCompound(toFuse)
 
-    def _sweep(self, path, makeSolid=True, isFrenet=False):
+    def _sweep(self, path, sweepAlongWires=False, makeSolid=True, isFrenet=False):
         """
         Makes a swept solid from an existing set of pending wires.
 
         :param path: A wire along which the pending wires will be swept
+        :param boolean sweepAlongWires:
+            False to create mutliple swept from wires on the chain along path
+            True to create only one solid swept along path with shape following the list of wires on the chain 
         :return:a FreeCAD solid, suitable for boolean operations
         """
 
@@ -2413,8 +2419,20 @@ class Workplane(CQ):
         self.ctx.pendingWires = []  # now all of the wires have been used to create an extrusion
 
         toFuse = []
-        for ws in wireSets:
-            thisObj = Solid.sweep(ws[0], ws[1:], path.val(), makeSolid, isFrenet)
+        if not sweepAlongWires:
+            for ws in wireSets:
+                thisObj = Solid.sweep(ws[0], ws[1:], path.val(), makeSolid, isFrenet)
+                toFuse.append(thisObj)
+        else:
+            section = []
+            for ws in wireSets:
+                for i in range(0, len(ws)):
+                    section.append(ws[i])
+
+            # implementation
+            outW = Wire(section[0].wrapped)
+            inW = section[1:]
+            thisObj = Solid.sweep(outW, inW, path.val(), makeSolid, isFrenet)
             toFuse.append(thisObj)
 
         return Compound.makeCompound(toFuse)
