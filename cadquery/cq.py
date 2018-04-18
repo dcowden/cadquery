@@ -1331,6 +1331,41 @@ class Workplane(CQ):
 
         return self.newObject([arc])
 
+    def sagittaArc(self, endPoint, sag, forConstruction=False):
+        """
+        Draw an arc from the current point to endPoint with an arc defined by the sag (sagitta).
+
+        :param endPoint: end point for the arc
+        :type endPoint: 2-tuple, in workplane coordinates
+        :param sag: the sagitta of the arc
+        :type sag: float, perpendicular distance from arc center to arc baseline.
+        :return: a workplane with the current point at the end of the arc
+
+        The sagitta is the distance from the center of the arc to the arc base.
+        Given that a closed contour is drawn clockwise;
+        A positive sagitta means convex arc and negative sagitta means concave arc.
+        See "https://en.wikipedia.org/wiki/Sagitta_(geometry)" for more information.
+        """
+
+        startPoint = self._findFromPoint(False)
+        endPoint = self.plane.toWorldCoords(endPoint)
+        midPoint = endPoint.add(startPoint).multiply(0.5)
+
+        sagVector = endPoint.sub(startPoint).normalized().multiply(abs(sag))
+        if(sag > 0):
+            sagVector.x, sagVector.y = -sagVector.y, sagVector.x # Rotate sagVector +90 deg
+        else:
+            sagVector.x, sagVector.y = sagVector.y, -sagVector.x # Rotate sagVector -90 deg
+
+        sagPoint = midPoint.add(sagVector)
+
+        arc = Edge.makeThreePointArc(startPoint, sagPoint, endPoint)
+
+        if not forConstruction:
+            self._addPendingEdge(arc)
+
+        return self.newObject([arc])
+
     def rotateAndCopy(self, matrix):
         """
         Makes a copy of all edges on the stack, rotates them according to the
@@ -2080,7 +2115,7 @@ class Workplane(CQ):
         :param path: A wire along which the pending wires will be swept
         :param boolean sweepAlongWires:
             False to create mutliple swept from wires on the chain along path
-            True to create only one solid swept along path with shape following the list of wires on the chain 
+            True to create only one solid swept along path with shape following the list of wires on the chain
         :param boolean combine: True to combine the resulting solid with parent solids if found.
         :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
         :return: a CQ object with the resulting solid selected.
@@ -2407,7 +2442,7 @@ class Workplane(CQ):
         :param path: A wire along which the pending wires will be swept
         :param boolean sweepAlongWires:
             False to create mutliple swept from wires on the chain along path
-            True to create only one solid swept along path with shape following the list of wires on the chain 
+            True to create only one solid swept along path with shape following the list of wires on the chain
         :return:a FreeCAD solid, suitable for boolean operations
         """
 
