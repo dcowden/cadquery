@@ -867,6 +867,10 @@ class TestCadQuery(BaseTest):
                           r.vertices(selectors.NearestToPointSelector((0.0, 0.0, 0.0)))\
                           .first().val().Y))
 
+        # Test the sagittaArc functions
+        s = Workplane(Plane.YZ())
+        r = s.sagittaArc((10, 8), 1).close()
+
     def testLargestDimension(self):
         """
         Tests the largestDimension function when no solids are on the stack and when there are
