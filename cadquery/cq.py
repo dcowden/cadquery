@@ -1366,6 +1366,34 @@ class Workplane(CQ):
 
         return self.newObject([arc])
 
+    def radiusArc(self, endPoint, radius, forConstruction=False):
+        """
+        Draw an arc from the current point to endPoint with an arc defined by the sag (sagitta).
+
+        :param endPoint: end point for the arc
+        :type endPoint: 2-tuple, in workplane coordinates
+        :param radius: the radius of the arc
+        :type radius: float, the radius of the arc between start point and end point.
+        :return: a workplane with the current point at the end of the arc
+
+        Given that a closed contour is drawn clockwise;
+        A positive radius means convex arc and negative radius means concave arc.
+        """
+
+        startPoint = self._findFromPoint(False)
+        endPoint = self.plane.toWorldCoords(endPoint)
+        midPoint = endPoint.add(startPoint).multiply(0.5)
+
+        # Calculate the sagitta from the radius
+        length = endPoint.sub(startPoint).Length / 2.0
+        sag = abs(radius) - math.sqrt(radius**2 - length**2)
+
+        # Return a sagittaArc
+        if radius > 0:
+            return self.sagittaArc(endPoint, sag, forConstruction)
+        else:
+            return self.sagittaArc(endPoint, -sag, forConstruction)
+
     def rotateAndCopy(self, matrix):
         """
         Makes a copy of all edges on the stack, rotates them according to the

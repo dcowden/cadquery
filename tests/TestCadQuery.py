@@ -871,6 +871,10 @@ class TestCadQuery(BaseTest):
         s = Workplane(Plane.YZ())
         r = s.sagittaArc((10, 8), 1).close()
 
+        # Test the radiusArc functions
+        s = Workplane(Plane.YZ())
+        r = s.radiusArc((10, 8), 50).close()
+
     def testLargestDimension(self):
         """
         Tests the largestDimension function when no solids are on the stack and when there are
