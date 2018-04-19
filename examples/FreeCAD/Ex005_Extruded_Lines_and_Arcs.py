@@ -42,6 +42,4 @@ result = cq.Workplane("front").lineTo(width, 0) \
                               .close().extrude(thickness)
 
 # Displays the result of this script
-#result.toSvg("/home/gustav/radiusarc.svg")
-cq.exporters.exportShape(result, "STEP", open("/home/gustav/radiusarc.step", "w"))
-#show_object(result)
+show_object(result)
