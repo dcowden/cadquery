@@ -18,15 +18,23 @@ thickness = 0.25    # Thickness of the plate
 #     half-way back to the origin in the X direction and 0.5 mm above where
 #     the last line ended at. The arc then ends at (0.0, 1.0), which is 1.0 mm
 #     above (in the Y direction) where our first line started from.
-# 5.  close() is called to automatically draw the last line for us and close
+# 5.  An arc is drawn from the last point that ends on (0.3, 0.2), the sag of 
+#     the curve 0.1 determines that the curve is concave with the midpoint 0.1 mm
+#     from the arc baseline. If the sag was -0.1 the arc would be convex.
+#     This convention is valid when the profile is drawn counterclockwise.
+#     The reverse is true if the profile is drawn clockwise.
+#     Clockwise:        +sag => convex,  -sag => concave
+#     Counterclockwise: +sag => concave, -sag => convex
+# 6.  close() is called to automatically draw the last line for us and close
 #     the sketch so that it can be extruded.
-# 5a. Without the close(), the 2D sketch will be left open and the extrude
+# 6a. Without the close(), the 2D sketch will be left open and the extrude
 #     operation will provide unpredictable results.
-# 6.  The 2D sketch is extruded into a solid object of the specified thickness.
+# 7.  The 2D sketch is extruded into a solid object of the specified thickness.
 result = cq.Workplane("front").lineTo(width, 0) \
                               .lineTo(width, 1.0) \
-                              .threePointArc((1.0, 1.5), (0.0, 1.0)) \
+                              .threePointArc((1.0, 2.5), (0.2, 2.6)) \
+                              .sagittaArc((0.3, 0.2), 0.1) \ 
                               .close().extrude(thickness)
-
+                              
 # Displays the result of this script
 show_object(result)
