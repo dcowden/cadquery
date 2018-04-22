@@ -1320,11 +1320,13 @@ class Workplane(CQ):
             provide tangent arcs
         """
 
-        gstartPoint = self._findFromPoint(False)
-        gpoint1 = self.plane.toWorldCoords(point1)
-        gpoint2 = self.plane.toWorldCoords(point2)
+        startPoint = self._findFromPoint(False)
+        if not isinstance(point1, Vector):
+            point1 = self.plane.toWorldCoords(point1)
+        if not isinstance(point2, Vector):
+            point2 = self.plane.toWorldCoords(point2)
 
-        arc = Edge.makeThreePointArc(gstartPoint, gpoint1, gpoint2)
+        arc = Edge.makeThreePointArc(startPoint, point1, point2)
 
         if not forConstruction:
             self._addPendingEdge(arc)
@@ -1348,7 +1350,9 @@ class Workplane(CQ):
         """
 
         startPoint = self._findFromPoint(False)
-        endPoint = self.plane.toWorldCoords(endPoint)
+        if not isinstance(endPoint, Vector):
+            endPoint = self.plane.toWorldCoords(endPoint)
+
         midPoint = endPoint.add(startPoint).multiply(0.5)
 
         sagVector = endPoint.sub(startPoint).normalized().multiply(abs(sag))
@@ -1359,12 +1363,7 @@ class Workplane(CQ):
 
         sagPoint = midPoint.add(sagVector)
 
-        arc = Edge.makeThreePointArc(startPoint, sagPoint, endPoint)
-
-        if not forConstruction:
-            self._addPendingEdge(arc)
-
-        return self.newObject([arc])
+        return self.threePointArc(sagPoint, endPoint, forConstruction)
 
     def radiusArc(self, endPoint, radius, forConstruction=False):
         """
@@ -1381,12 +1380,15 @@ class Workplane(CQ):
         """
 
         startPoint = self._findFromPoint(False)
-        endPoint = self.plane.toWorldCoords(endPoint)
-        midPoint = endPoint.add(startPoint).multiply(0.5)
+        if not isinstance(endPoint, Vector):
+            endPoint = self.plane.toWorldCoords(endPoint)
 
         # Calculate the sagitta from the radius
         length = endPoint.sub(startPoint).Length / 2.0
-        sag = abs(radius) - math.sqrt(radius**2 - length**2)
+        try:
+            sag = abs(radius) - math.sqrt(radius**2 - length**2)
+        except ValueError:
+            raise ValueError("Arc radius is not large enough to reach the end point.")
 
         # Return a sagittaArc
         if radius > 0:

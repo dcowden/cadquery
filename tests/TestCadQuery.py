@@ -867,13 +867,19 @@ class TestCadQuery(BaseTest):
                           r.vertices(selectors.NearestToPointSelector((0.0, 0.0, 0.0)))\
                           .first().val().Y))
 
-        # Test the sagittaArc functions
-        s = Workplane(Plane.YZ())
-        r = s.sagittaArc((10, 8), 1).close()
+        # Test the sagittaArc and radiusArc functions
+        a1 = Workplane(Plane.YZ()).threePointArc((5, 1), (10, 0))
+        a2 = Workplane(Plane.YZ()).sagittaArc((10, 0), -1)
+        a3 = Workplane(Plane.YZ()).threePointArc((6, 2), (12, 0))
+        a4 = Workplane(Plane.YZ()).radiusArc((12, 0), -10)
 
-        # Test the radiusArc functions
-        s = Workplane(Plane.YZ())
-        r = s.radiusArc((10, 8), 50).close()
+        assert(a1.edges().first().val().geomType() == "CIRCLE")
+        assert(a2.edges().first().val().geomType() == "CIRCLE")
+        assert(a3.edges().first().val().geomType() == "CIRCLE")
+        assert(a4.edges().first().val().geomType() == "CIRCLE")
+
+        assert(a1.edges().first().val().Length() == a2.edges().first().val().Length())
+        assert(a3.edges().first().val().Length() == a4.edges().first().val().Length())
 
     def testLargestDimension(self):
         """
