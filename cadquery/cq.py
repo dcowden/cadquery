@@ -1349,10 +1349,8 @@ class Workplane(CQ):
         See "https://en.wikipedia.org/wiki/Sagitta_(geometry)" for more information.
         """
 
-        startPoint = self._findFromPoint(False)
-        if not isinstance(endPoint, Vector):
-            endPoint = self.plane.toWorldCoords(endPoint)
-
+        startPoint = self._findFromPoint(useLocalCoords=True)
+        endPoint = Vector(endPoint)
         midPoint = endPoint.add(startPoint).multiply(0.5)
 
         sagVector = endPoint.sub(startPoint).normalized().multiply(abs(sag))
@@ -1379,9 +1377,8 @@ class Workplane(CQ):
         A positive radius means convex arc and negative radius means concave arc.
         """
 
-        startPoint = self._findFromPoint(False)
-        if not isinstance(endPoint, Vector):
-            endPoint = self.plane.toWorldCoords(endPoint)
+        startPoint = self._findFromPoint(useLocalCoords=True)
+        endPoint = Vector(endPoint)
 
         # Calculate the sagitta from the radius
         length = endPoint.sub(startPoint).Length / 2.0
