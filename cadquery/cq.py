@@ -1320,11 +1320,13 @@ class Workplane(CQ):
             provide tangent arcs
         """
 
-        gstartPoint = self._findFromPoint(False)
-        gpoint1 = self.plane.toWorldCoords(point1)
-        gpoint2 = self.plane.toWorldCoords(point2)
+        startPoint = self._findFromPoint(False)
+        if not isinstance(point1, Vector):
+            point1 = self.plane.toWorldCoords(point1)
+        if not isinstance(point2, Vector):
+            point2 = self.plane.toWorldCoords(point2)
 
-        arc = Edge.makeThreePointArc(gstartPoint, gpoint1, gpoint2)
+        arc = Edge.makeThreePointArc(startPoint, point1, point2)
 
         if not forConstruction:
             self._addPendingEdge(arc)
@@ -1347,8 +1349,8 @@ class Workplane(CQ):
         See "https://en.wikipedia.org/wiki/Sagitta_(geometry)" for more information.
         """
 
-        startPoint = self._findFromPoint(False)
-        endPoint = self.plane.toWorldCoords(endPoint)
+        startPoint = self._findFromPoint(useLocalCoords=True)
+        endPoint = Vector(endPoint)
         midPoint = endPoint.add(startPoint).multiply(0.5)
 
         sagVector = endPoint.sub(startPoint).normalized().multiply(abs(sag))
@@ -1359,12 +1361,37 @@ class Workplane(CQ):
 
         sagPoint = midPoint.add(sagVector)
 
-        arc = Edge.makeThreePointArc(startPoint, sagPoint, endPoint)
+        return self.threePointArc(sagPoint, endPoint, forConstruction)
 
-        if not forConstruction:
-            self._addPendingEdge(arc)
+    def radiusArc(self, endPoint, radius, forConstruction=False):
+        """
+        Draw an arc from the current point to endPoint with an arc defined by the sag (sagitta).
 
-        return self.newObject([arc])
+        :param endPoint: end point for the arc
+        :type endPoint: 2-tuple, in workplane coordinates
+        :param radius: the radius of the arc
+        :type radius: float, the radius of the arc between start point and end point.
+        :return: a workplane with the current point at the end of the arc
+
+        Given that a closed contour is drawn clockwise;
+        A positive radius means convex arc and negative radius means concave arc.
+        """
+
+        startPoint = self._findFromPoint(useLocalCoords=True)
+        endPoint = Vector(endPoint)
+
+        # Calculate the sagitta from the radius
+        length = endPoint.sub(startPoint).Length / 2.0
+        try:
+            sag = abs(radius) - math.sqrt(radius**2 - length**2)
+        except ValueError:
+            raise ValueError("Arc radius is not large enough to reach the end point.")
+
+        # Return a sagittaArc
+        if radius > 0:
+            return self.sagittaArc(endPoint, sag, forConstruction)
+        else:
+            return self.sagittaArc(endPoint, -sag, forConstruction)
 
     def rotateAndCopy(self, matrix):
         """
