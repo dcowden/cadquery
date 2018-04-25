@@ -1595,3 +1595,15 @@ class TestCadQuery(BaseTest):
         self.assertTupleAlmostEquals(delta.toTuple(),
                                      (0.,0.,2.*h),
                                      decimal_places)
+
+    def testClose(self):
+        # Close without endPoint and startPoint coincide.
+        # Create a half-circle
+        a = Workplane(Plane.XY()).sagittaArc((10, 0), 2).close().extrude(2)
+
+        # Close when endPoint and startPoint coincide.
+        # Create a double half-circle
+        b = Workplane(Plane.XY()).sagittaArc((10, 0), 2).sagittaArc((0, 0), 2).close().extrude(2)
+
+        # The b shape shall have twice the volume of the a shape.
+        self.assertAlmostEqual(a.val().wrapped.Volume * 2.0, b.val().wrapped.Volume)
