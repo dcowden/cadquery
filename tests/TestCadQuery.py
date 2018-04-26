@@ -1617,3 +1617,13 @@ class TestCadQuery(BaseTest):
 
         # The b shape shall have twice the volume of the a shape.
         self.assertAlmostEqual(a.val().wrapped.Volume * 2.0, b.val().wrapped.Volume)
+
+        # Testcase 3 from issue #238
+        thickness = 3
+        length = 10
+        width = 5
+
+        obj = Workplane('XY', origin=(0, 0, -thickness / 2)) \
+            .moveTo(length / 2, 0).threePointArc((0, width / 2), (-length / 2, 0)) \
+            .threePointArc((0, -width / 2), (length / 2, 0)) \
+            .close().extrude(thickness)

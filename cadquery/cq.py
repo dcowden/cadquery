@@ -1800,7 +1800,7 @@ class Workplane(CQ):
 
             s = Workplane().lineTo(1,0).lineTo(1,1).close().extrude(0.2)
         """
-        endPoint = self._findFromPoint(False)
+        endPoint = self._findFromPoint(True)
         startPoint = self.ctx.firstPoint
 
         # Check if there is a distance between startPoint and endPoint
