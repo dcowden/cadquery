@@ -1605,3 +1605,36 @@ class TestCadQuery(BaseTest):
         self.assertTupleAlmostEquals(delta.toTuple(),
                                      (0.,0.,2.*h),
                                      decimal_places)
+
+    def testClose(self):
+        # Close without endPoint and startPoint coincide.
+        # Create a half-circle
+        a = Workplane(Plane.XY()).sagittaArc((10, 0), 2).close().extrude(2)
+
+        # Close when endPoint and startPoint coincide.
+        # Create a double half-circle
+        b = Workplane(Plane.XY()).sagittaArc((10, 0), 2).sagittaArc((0, 0), 2).close().extrude(2)
+
+        # The b shape shall have twice the volume of the a shape.
+        self.assertAlmostEqual(a.val().wrapped.Volume * 2.0, b.val().wrapped.Volume)
+
+        # Testcase 3 from issue #238
+        thickness = 3.0
+        length = 10.0
+        width = 5.0
+
+        obj1 = Workplane('XY', origin=(0, 0, -thickness / 2)) \
+            .moveTo(length / 2, 0).threePointArc((0, width / 2), (-length / 2, 0)) \
+            .threePointArc((0, -width / 2), (length / 2, 0)) \
+            .close().extrude(thickness)
+
+        os_x = 8.0    # Offset in X
+        os_y = -19.5  # Offset in Y
+
+        obj2 = Workplane('YZ', origin=(os_x, os_y, -thickness / 2)) \
+            .moveTo(os_x + length / 2, os_y).sagittaArc((os_x -length / 2, os_y), width / 2) \
+            .sagittaArc((os_x + length / 2, os_y), width / 2) \
+            .close().extrude(thickness)
+
+        # The obj1 shape shall have the same volume as the obj2 shape.
+        self.assertAlmostEqual(obj1.val().wrapped.Volume, obj2.val().wrapped.Volume)

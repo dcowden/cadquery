@@ -1321,10 +1321,8 @@ class Workplane(CQ):
         """
 
         startPoint = self._findFromPoint(False)
-        if not isinstance(point1, Vector):
-            point1 = self.plane.toWorldCoords(point1)
-        if not isinstance(point2, Vector):
-            point2 = self.plane.toWorldCoords(point2)
+        point1 = self.plane.toWorldCoords(point1)
+        point2 = self.plane.toWorldCoords(point2)
 
         arc = Edge.makeThreePointArc(startPoint, point1, point2)
 
@@ -1800,7 +1798,14 @@ class Workplane(CQ):
 
             s = Workplane().lineTo(1,0).lineTo(1,1).close().extrude(0.2)
         """
-        self.lineTo(self.ctx.firstPoint.x, self.ctx.firstPoint.y)
+        endPoint = self._findFromPoint(True)
+        startPoint = self.ctx.firstPoint
+
+        # Check if there is a distance between startPoint and endPoint
+        # that is larger than what is considered a numerical error.
+        # If so; add a line segment between endPoint and startPoint
+        if endPoint.sub(startPoint).Length > 1e-6:
+            self.lineTo(self.ctx.firstPoint.x, self.ctx.firstPoint.y)
 
         # Need to reset the first point after closing a wire
         self.ctx.firstPoint=None
