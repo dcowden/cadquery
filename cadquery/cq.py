@@ -1321,10 +1321,8 @@ class Workplane(CQ):
         """
 
         startPoint = self._findFromPoint(False)
-        if not isinstance(point1, Vector):
-            point1 = self.plane.toWorldCoords(point1)
-        if not isinstance(point2, Vector):
-            point2 = self.plane.toWorldCoords(point2)
+        point1 = self.plane.toWorldCoords(point1)
+        point2 = self.plane.toWorldCoords(point2)
 
         arc = Edge.makeThreePointArc(startPoint, point1, point2)
 
