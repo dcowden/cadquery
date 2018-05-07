@@ -9,6 +9,7 @@ v1.2.0 (Unreleased)
    * @adam-urbanczyk added codecov in Travis CI configuration
    * @jpmlt updated sweep operation to work with a list of wires #249
    * @gntech added ability to draw an arc from the current point to endPoint with an arc defined by the sag (sagitta) #253
+   * @gntech added ability to draw an arc from the current point to endPoint with an arc defined by the radius #254
    * @gntech updated the close function to be smarter when the start point and end points are the same #257
    * @gntech removed some waste from the CI test environment by avoiding the installation of the FreeCAD docs #256
 
