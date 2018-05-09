@@ -2,7 +2,7 @@ Changes
 =======
 
 
-v1.2.0 (Unreleased)
+v1.2.0
 ------
    * Multiple Anaconda CI fixes by @adam-urbanczyk
    * @adam-urbanczyk added AppVeyor with Windows test integration to the CI pipeline
@@ -34,8 +34,8 @@ v1.1.0
    * SVG export improvements including orientation control from @RustyVermeer #232
    * Improved test coverage
    * @galou fixed braille example #229
-   
-   
+
+
 v1.0.0
 ------
    * Added an option to do symmetric extrusion about the workplane (thanks @adam-urbanczyk)
@@ -49,7 +49,7 @@ v1.0.0
 v0.5.2
 ------
    * Added the sweep operation #33
-   
+
 v0.5.1
 ------
    * Mirroring fixes (thanks @huskier)
@@ -84,7 +84,7 @@ v0.3.0
    * Add the ability to find the center of the bounding box, rather than the center of mass (thanks @huskier) #122
    * Changed normalize function to normalized to match OCC/PythonOCC nomenclature #124
    * Added a label attribute to all freecad_impl.shapes so that they can have IDs attached to them #124
-   
+
 v0.2.0
 -----
    * Fixed versioning to match the semantic versioning scheme
@@ -103,7 +103,7 @@ v0.2.0
    * Increased test coverage
    * Added a clean function to keep some operations from failing on solids that need simplified (thanks @hyOzd)
    * Added a mention of the new Google Group to the readme
-   
+
 v0.1.8
 -----
    * Added toFreecad() function as a convenience for val().wrapped
@@ -124,11 +124,11 @@ v0.1.7
 -----
    * Added revolve operation and supporting tests
    * Fixed minor documentation errors
-   
+
 v0.1.6
 -----
    * Added STEP import and supporting tests
-   
+
 v0.1
 -----
    * Initial Version
