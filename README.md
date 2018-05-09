@@ -257,8 +257,7 @@ Adam Urbańczyk has been working hard on his own [CQ fork](https://github.com/ad
 Work has begun on Cadquery 2.0, which will feature:
 
    1. Feature trees, for more powerful selection
-   2. Direct use of OpenCascade Community Edition(OCE), so that it is no longer required to install FreeCAD
-   3. https://github.com/jmwright/cadquery-gui, which will allow visualization of workplanes  
+   2. Direct use of OpenCascade Community Edition (OCE), so that it is no longer required to install FreeCAD
 
 The project page can be found here: https://github.com/dcowden/cadquery/projects/1
 
