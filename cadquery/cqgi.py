@@ -101,6 +101,7 @@ class CQModel(object):
             self.set_param_values(build_parameters)
             collector = ScriptCallback()
             env = EnvironmentBuilder().with_real_builtins().with_cadquery_objects() \
+                .add_entry("__name__", "__cqgi__") \
                 .add_entry("show_object", collector.show_object) \
                 .add_entry("debug", collector.debug) \
                 .add_entry("describe_parameter",collector.describe_parameter) \
