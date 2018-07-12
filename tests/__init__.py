@@ -43,7 +43,7 @@ def toTuple(v):
     elif type(v) == Vector:
         return v.toTuple()
     else:
-        raise RuntimeError("dont know how to convert type %s to tuple" % str(type(v)) )
+        raise RuntimeError("don't know how to convert type %s to tuple" % str(type(v)) )
 
 
 class BaseTest(unittest.TestCase):

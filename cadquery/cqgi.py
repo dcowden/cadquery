@@ -30,7 +30,7 @@ class CQModel(object):
 
     After construction, the metadata property contains
     a ScriptMetaData object, which describes the model in more detail,
-    and can be used to retrive the parameters defined by the model.
+    and can be used to retrieve the parameters defined by the model.
 
     the build method can be used to generate a 3d model
     """
@@ -44,7 +44,7 @@ class CQModel(object):
         self.script_source = script_source
         self._find_vars()
 
-        # TODO: pick up other scirpt metadata:
+        # TODO: pick up other script metadata:
         # describe
         # pick up validation methods
         self._find_descriptions()
@@ -58,7 +58,7 @@ class CQModel(object):
         #are only at the top level of the script. IE, we'll ignore any
         #variable definitions at lower levels of the script
 
-        #we dont want to use the visit interface because here we excplicitly
+        #we don't want to use the visit interface because here we explicitly
         #want to walk only the top level of the tree.
         assignment_finder = ConstantAssignmentFinder(self.metadata)
 
@@ -85,7 +85,7 @@ class CQModel(object):
         :param build_parameters: a dictionary of variables. The variables must be
         assignable to the underlying variable type. These variables override default values in the script
         :param build_options: build options for how to build the model. Build options include things like
-        timeouts, tesselation tolerances, etc
+        timeouts, tessellation tolerances, etc
         :raises: Nothing. If there is an exception, it will be on the exception property of the result.
         This is the interface so that we can return other information on the result, such as the build time
         :return: a BuildResult object, which includes the status of the result, and either
@@ -308,7 +308,7 @@ class ScriptCallback(object):
         """
         return an object to the executing environment, with options
         :param shape: a cadquery object
-        :param options: a dictionary of options that will be made available to the executing envrionment
+        :param options: a dictionary of options that will be made available to the executing environment
         """
         o = ShapeResult()
         o.options=options
@@ -326,7 +326,7 @@ class ScriptCallback(object):
 
     def describe_parameter(self,var_data ):
         """
-        Do Nothing-- we parsed the ast ahead of exection to get what we need.
+        Do Nothing-- we parsed the ast ahead of execution to get what we need.
         """
         pass
 

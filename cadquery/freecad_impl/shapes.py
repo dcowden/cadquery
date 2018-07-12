@@ -105,7 +105,7 @@ class Shape(object):
         return tr
 
     # TODO: all these should move into the exporters folder.
-    # we dont need a bunch of exporting code stored in here!
+    # we don't need a bunch of exporting code stored in here!
     #
     def exportStl(self, fileName, tolerance=0.1):
         self.wrapped.exportStl(fileName, tolerance)
@@ -354,7 +354,7 @@ class Shape(object):
     def transformShape(self, tMatrix):
         """
             tMatrix is a matrix object.
-            returns a copy of the ojbect, transformed by the provided matrix,
+            returns a copy of the object, transformed by the provided matrix,
             with all objects keeping their type
         """
         tmp = self.wrapped.copy()
@@ -367,14 +367,14 @@ class Shape(object):
         """
             tMatrix is a matrix object.
 
-            returns a copy of the object, but with geometry transformed insetad of just
+            returns a copy of the object, but with geometry transformed instead of just
             rotated.
 
             WARNING: transformGeometry will sometimes convert lines and circles to splines,
             but it also has the ability to handle skew and stretching transformations.
 
             If your transformation is only translation and rotation, it is safer to use transformShape,
-            which doesnt change the underlying type of the geometry, but cannot handle skew transformations
+            which doesn't change the underlying type of the geometry, but cannot handle skew transformations
         """
         tmp = self.wrapped.copy()
         tmp = tmp.transformGeometry(tMatrix)
@@ -449,7 +449,7 @@ class Edge(Shape):
     def startPoint(self):
         """
 
-            :return: a vector representing the start poing of this edge
+            :return: a vector representing the start point of this edge
 
             Note, circles may have the start and end points the same
         """

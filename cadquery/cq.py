@@ -719,7 +719,7 @@ class CQ(object):
         Future Enhancements:
             * A version of this method that returns a transformed copy, rather than modifying
               the originals
-            * This method doesnt expose a very good interface, because the axis of rotation
+            * This method doesn't expose a very good interface, because the axis of rotation
               could be inconsistent between multiple objects.  This is because the beginning
               of the axis is variable, while the end is fixed. This is fine when operating on
               one object, but is not cool for multiple.
@@ -1443,7 +1443,7 @@ class Workplane(CQ):
         Produces a flat, heart shaped object
 
         Future Enhancements:
-            mirrorX().mirrorY() should work but doesnt, due to some FreeCAD weirdness
+            mirrorX().mirrorY() should work but doesn't, due to some FreeCAD weirdness
         """
         tm = Matrix()
         tm.rotateY(math.pi)
@@ -1461,7 +1461,7 @@ class Workplane(CQ):
         Typically used to make creating wires with symmetry easier.
 
         Future Enhancements:
-            mirrorX().mirrorY() should work but doesnt, due to some FreeCAD weirdness
+            mirrorX().mirrorY() should work but doesn't, due to some FreeCAD weirdness
         """
         tm = Matrix()
         tm.rotateX(math.pi)
@@ -1852,7 +1852,7 @@ class Workplane(CQ):
         ctxSolid.wrapped = s.wrapped
         return self.newObject([s])
 
-    #but parameter list is different so a simple function pointer wont work
+    #but parameter list is different so a simple function pointer won't work
     def cboreHole(self, diameter, cboreDiameter, cboreDepth, depth=None, clean=True):
         """
         Makes a counterbored hole for each item on the stack.
@@ -1904,7 +1904,7 @@ class Workplane(CQ):
         return self.cutEach(_makeCbore, True, clean)
 
     #TODO: almost all code duplicated!
-    #but parameter list is different so a simple function pointer wont work
+    #but parameter list is different so a simple function pointer won't work
     def cskHole(self, diameter, cskDiameter, cskAngle, depth=None, clean=True):
         """
         Makes a countersunk hole for each item on the stack.
@@ -1955,7 +1955,7 @@ class Workplane(CQ):
         return self.cutEach(_makeCsk, True, clean)
 
     #TODO: almost all code duplicated!
-    #but parameter list is different so a simple function pointer wont work
+    #but parameter list is different so a simple function pointer won't work
     def hole(self, diameter, depth=None, clean=True):
         """
         Makes a hole for each item on the stack.
@@ -2146,7 +2146,7 @@ class Workplane(CQ):
 
         :param path: A wire along which the pending wires will be swept
         :param boolean sweepAlongWires:
-            False to create mutliple swept from wires on the chain along path
+            False to create multiple swept from wires on the chain along path
             True to create only one solid swept along path with shape following the list of wires on the chain
         :param boolean combine: True to combine the resulting solid with parent solids if found.
         :param boolean clean: call :py:meth:`clean` afterwards to have a clean shape
@@ -2473,7 +2473,7 @@ class Workplane(CQ):
 
         :param path: A wire along which the pending wires will be swept
         :param boolean sweepAlongWires:
-            False to create mutliple swept from wires on the chain along path
+            False to create multiple swept from wires on the chain along path
             True to create only one solid swept along path with shape following the list of wires on the chain
         :return:a FreeCAD solid, suitable for boolean operations
         """

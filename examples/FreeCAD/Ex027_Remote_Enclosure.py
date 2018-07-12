@@ -8,10 +8,10 @@ width = 2.2             # Nominal x dimension of the part
 height = 0.5            # Height from bottom top to the top of the top :P
 length = 1.5            # Nominal y dimension of the part
 trapezoidFudge = 0.7    # ratio of trapezoid bases. set to 1.0 for cube
-xHoleOffset = 0.500     # Holes are distributed symetrically about each axis
+xHoleOffset = 0.500     # Holes are distributed symmetrically about each axis
 yHoleOffset = 0.500
 zFilletRadius = 0.50    # Fillet radius of corners perp. to Z axis.
-yFilletRadius = 0.250   # Fillet readius of the top edge of the case
+yFilletRadius = 0.250   # Fillet radius of the top edge of the case
 lipHeight = 0.1         # The height of the lip on the inside of the cover
 wallThickness = 0.06    # Wall thickness for the case
 coverThickness = 0.2    # Thickness of the cover plate
@@ -23,7 +23,7 @@ yzplane = cq.Workplane("YZ")
 
 
 def trapezoid(b1, b2, h):
-    "Defines a symetrical trapezoid in the XY plane."
+    "Defines a symmetrical trapezoid in the XY plane."
 
     y = h / 2
     x1 = b1 / 2

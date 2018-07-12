@@ -102,7 +102,7 @@ def disable():
     """
     Disables logging to FreeCAD console (or STDOUT).
     Note, logging may be enabled by another imported module, so this isn't a
-    guarentee; this function undoes logging_enable(), nothing more.
+    guarantee; this function undoes logging_enable(), nothing more.
     """
     global _logging_handler
     if _logging_handler:
