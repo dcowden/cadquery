@@ -78,7 +78,7 @@ def exportShape(shape,exportType,fileLike,tolerance=0.1):
         #weird, but we need to close this file. the next step is going to write to
         #it from c code, so it needs to be closed.
         #FreeCAD junks up stdout with a bunch of messages, so this context
-        #manager supresses that stuff in the case we're trying to write to stdout
+        #manager suppresses that stuff in the case we're trying to write to stdout
         os.close(h)
         with suppress_stdout_stderr():
             if exportType == ExportTypes.STEP:

@@ -11,14 +11,14 @@ Want a quick glimpse of what CadQuery can do?  This quickstart will demonstrate 
 Prerequisites: FreeCAD + cadQuery-freeCAD-module in FreeCAD
 ==============================================================
 
-If you have not already done so, follow the :ref:`installation`, and  to install cadquery, FreeCAD,
+If you have not already done so, follow the :ref:`installation`, and  to install CadQuery, FreeCAD,
 and the cadquery-freecad-module
 
 After installation, open the CadQuery workbench:
 
 ..  image:: _static/quickstart/001.png
 
-You'll see that we start out with a single block.  Find the cadquery Code Window, at the bottom left.
+You'll see that we start out with a single block.  Find the CadQuery Code Window, at the bottom left.
 
 If you want check out a couple of the examples in the CadQuery->Examples menu.
 
@@ -170,7 +170,7 @@ There are a couple of things to note about this line:
        tells CadQuery that this rectangle will not form a part of the solid,
        but we are just using it to help define some other geometry.
     2. The center point of a workplane on a face is always at the center of the face, which works well here
-    3. Unless you specifiy otherwise, a rectangle is drawn with its center on the current workplane center-- in
+    3. Unless you specify otherwise, a rectangle is drawn with its center on the current workplane center-- in
        this case, the center of the top face of the block. So this rectangle will be centered on the face
 
 
@@ -236,7 +236,7 @@ with < 20 lines of code.
 Want to learn more?
 ====================
 
-   * Use the CadQuery->Examples menu of the cadquery workbench to explore a lot of other examples.
-   * The :ref:`examples` contains lots of examples demonstrating cadquery features
+   * Use the CadQuery->Examples menu of the CadQuery workbench to explore a lot of other examples.
+   * The :ref:`examples` contains lots of examples demonstrating CadQuery features
    * The :ref:`apireference` is a good overview of language features grouped by function
    * The :ref:`classreference` is the hard-core listing of all functions available.

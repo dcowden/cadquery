@@ -104,7 +104,7 @@ res = res.vLine(-support_depth).\
 res = res.extrude(main_plate_size_x/2, both=True, clean=True)  # extrude the triangle, now the bridge has a nice support making it much more stiff
 
 # Start cutting out a slot for hotend mounting
-face = res.faces('>Y')  # select the most extreme face in Y direction, i.e. top ot the "bridge"
+face = res.faces('>Y')  # select the most extreme face in Y direction, i.e. top of the "bridge"
 res = move_to_center(face.workplane(), face.edges('>Z').val())  # shift the workplane to the center of the most extreme edge of the bridge
 
 

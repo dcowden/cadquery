@@ -608,7 +608,7 @@ class TestCadQuery(BaseTest):
         self.assertEqual(0,s.faces().size() ) # the original workplane does not, because it did not have a solid initially
 
         t = r.faces(">Z").workplane().rect(0.25,0.25).extrude(0.5,False)
-        self.assertEqual(6,t.faces().size()) #result has 6 faces, becuase it was not combined with the original
+        self.assertEqual(6,t.faces().size()) #result has 6 faces, because it was not combined with the original
         self.assertEqual(6,r.faces().size()) #original is unmodified as well
         #subseuent opertions use that context solid afterwards
 
@@ -799,7 +799,7 @@ class TestCadQuery(BaseTest):
         s = Workplane(Plane.XY())
 
         #TODO:  extrude() should imply wire() if not done already
-        #most users dont understand what a wire is, they are just drawing
+        #most users don't understand what a wire is, they are just drawing
 
         r = s.lineTo(1.0,0).lineTo(0,1.0).close().wire().extrude(0.25)
         with suppress_stdout_stderr():
@@ -1488,7 +1488,7 @@ class TestCadQuery(BaseTest):
                 return cup
         """
 
-        #for some reason shell doesnt work on this simple shape. how disappointing!
+        #for some reason shell doesn't work on this simple shape. how disappointing!
         td = 50.0
         bd = 20.0
         h = 10.0

@@ -192,7 +192,7 @@ class Vector(object):
         """Return the vector itself
 
         The center of myself is myself.
-        Provided so that vectors, vertexes, and other shapes all support a
+        Provided so that vectors, vertices, and other shapes all support a
         common interface, when Center() is requested for all objects on the
         stack.
         """
@@ -216,7 +216,7 @@ class Vector(object):
     def __bool__(self):
         return any(coord != 0 for coord in self.toTuple())
 
-    __nonzero__ = __bool__  # python 2.x compatability
+    __nonzero__ = __bool__  # python 2.x compatibility
 
     def __add__(self, v):
         return self.add(v)
@@ -433,7 +433,7 @@ class Plane(object):
         **Non-orthogonal vectors**
 
         If the ``xDir`` and ``normal`` vectors are not orthogonal, the ``normal``
-        (or ``z`` axis) vector direction is preserved, and truely orthogonal
+        (or ``z`` axis) vector direction is preserved, and truly orthogonal
         ``x`` and ``y`` axes are calculated with cross products.
 
         * ``y = z.cross(x)``, and

@@ -108,7 +108,7 @@ If a parameter called 'param' is defined in the model, it will be assigned the v
 An error will occur if a value is provided that is not defined in the model, or if the value provided cannot
 be assigned to a variable with the given name.
 
-build_options is used to set server-side settings like timeouts, tesselation tolerances, and other details about
+build_options is used to set server-side settings like timeouts, tessellation tolerances, and other details about
 how the model should be built.
 
 
@@ -141,7 +141,7 @@ You can list the variables defined in the model by using the return value of the
 The key of the dictionary is a string , and the value is a :py:class:`cadquery.cqgi.InputParameter` object
 See the CQGI API docs for more details.
 
-Future enhancments will include a safer sandbox to prevent malicious scripts.
+Future enhancements will include a safer sandbox to prevent malicious scripts.
 
 Important CQGI Methods
 -------------------------

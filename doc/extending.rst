@@ -4,7 +4,7 @@ Extending CadQuery
 ======================
 
 
-If you find that CadQuery doesnt suit your needs, you can easily extend it.  CadQuery provides several extension
+If you find that CadQuery doesn't suit your needs, you can easily extend it.  CadQuery provides several extension
 methods:
 
    * You can load plugins others have developed. This is by far the easiest way to access other code
@@ -25,7 +25,7 @@ is actually equivalent to::
     return Part.makeBox(1.0,2.0,3.0)
 
 As long as you return a valid FreeCAD Shape, you can use any FreeCAD methods you like. You can even mix and match the
-two. For example, consider this script, which creates a FreeCAD box, but then uses cadquery to select its faces::
+two. For example, consider this script, which creates a FreeCAD box, but then uses CadQuery to select its faces::
 
     box = Part.makeBox(1.0,2.0,3.0)
     cq = CQ(box).faces(">Z").size() # returns 6
@@ -108,7 +108,7 @@ are designed to aid in plugin creation:
    * :py:meth:`cadquery.Workplane.plane` provides a reference to the workplane, which allows you to convert between workplane
      coordinates and global coordinates:
      * :py:meth:`cadquery.freecad_impl.geom.Plane.toWorldCoords` will convert local coordinates to global ones
-     * :py:meth:`cadquery.freecad_impl.geom.Plane.toLocalCoords` will convet from global coordinates to local coordinates
+     * :py:meth:`cadquery.freecad_impl.geom.Plane.toLocalCoords` will convert from global coordinates to local coordinates
 
 Coordinate Systems
 -----------------------
@@ -140,7 +140,7 @@ That's it!
 
 CadQueryExample Plugins
 -----------------------
-Some core cadquery code is intentionally written exactly like a plugin.
+Some core CadQuery code is intentionally written exactly like a plugin.
 If you are writing your own plugins, have a look at these methods for inspiration:
 
    * :py:meth:`cadquery.Workplane.polygon`
@@ -177,4 +177,3 @@ This ultra simple plugin makes cubes of the specified size for each stack point.
             .rect(4.0,4.0,forConstruction=True).vertices() \
             .makeCubes(1.0).combineSolids()
         show_object(result)
-

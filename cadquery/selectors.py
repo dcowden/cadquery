@@ -155,7 +155,7 @@ class BaseDirSelector(Selector):
             #no really good way to avoid a switch here, edges and faces are simply different!
 
             if type(o) == Face:
-                # a face is only parallell to a direction if it is a plane, and its normal is parallel to the dir
+                # a face is only parallel to a direction if it is a plane, and its normal is parallel to the dir
                 normal = o.normalAt(None)
 
                 if self.test(normal):
@@ -392,7 +392,7 @@ class SumSelector(BinarySelector):
 
 class SubtractSelector(BinarySelector):
     """
-    Difference selector. Substract results of a selector from another
+    Difference selector. Subtract results of a selector from another
     selectors results.
     """
     def filterResults(self, r_left, r_right):
@@ -630,7 +630,7 @@ class StringSyntaxSelector(Selector):
     ***axisStrings*** are: ``X,Y,Z,XY,YZ,XZ`` or ``(x,y,z)`` which defines an arbitrary direction
     
     It is possible to combine simple selectors together using logical operations.
-    The following operations are suuported
+    The following operations are supported
     
         :and:
             Logical AND, e.g. >X and >Y
