@@ -604,6 +604,35 @@ Here we fillet all of the edges of a simple plate.
         * :py:meth:`Workplane.edges`
         * :py:meth:`Workplane`
 
+A reinforced junction between two pieces with Fillet
+-----------------------------------------
+
+The fillet can also be used to reinfoce a junction between two pieces.
+
+.. cq_plot::
+
+        s = cq.Workplane("XY")
+
+        horizontalPart = s.box(10, 5, 1)
+        verticalPart = s.box(10, 1, 5).translate((0, 0, 1 + 5/2))
+
+        result = horizontalPart.union(verticalPart) \
+                 .faces(">Z[1]").edges("not(<X or >X or <Y or >Y)").fillet(1)
+
+        show_object(result)
+
+.. topic:: Api References
+
+    .. hlist::
+        :columns: 2
+
+        * :py:meth:`Workplane`
+        * :py:meth:`Workplane.box`
+        * :py:meth:`Workplane.faces`
+        * :py:meth:`Workplane.edges`
+        * :ref:`selector_reference`
+        * :py:meth:`Workplane.fillet`
+
 A Parametric Bearing Pillow Block
 ------------------------------------
 
@@ -620,7 +649,6 @@ with just a few lines of code.
                 .vertices().cboreHole(2.4, 4.4, 2.1)
 
         show_object(result)
-
 
 Splitting an Object
 ---------------------
