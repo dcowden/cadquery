@@ -1,5 +1,5 @@
 .. image:: http://dcowden.github.io/cadquery/_static/cadquery_logo_dark.svg
-    :width: 100
+    :width: 100px
     :align: center
 
 
@@ -125,10 +125,10 @@ This resin mold was modeled using cadquery and then created on a CNC machine:
 |hyOzd_cablefix| |hyOzd_finished|
 
 .. |hyOzd_cablefix| image:: http://dcowden.github.io/cadquery/_static/hyOzd-cablefix.png
-    :width: 350
+    :width: 350px
 
 .. |hyOzd_finished| image:: http://dcowden.github.io/cadquery/_static/hyOzd-finished.jpg
-    :width: 350
+    :width: 350px
 
 The cadquery script is surprisingly short, and allows easily customizing any of the variables:
 
@@ -204,22 +204,22 @@ Thanks go to cadquery contributor hyOzd ( Altu Technology ) for the example!
 KiCad uses cadquery to build high quality models of electrictronic components. (`https://github.com/KiCad/packages3D <https://github.com/KiCad/packages3D>`_)
 
 .. image:: https://forum.freecadweb.org/download/file.php?id=33797&sid=b8584f80928497722e9ee9d582a3fa43
-    :width: 350
+    :width: 350px
 
 This Prusa i3 extruder support uses cadquery to build the model (`https://github.com/adam-urbanczyk/cadquery-models <https://github.com/adam-urbanczyk/cadquery-models>`_):
 
 .. image:: https://github.com/adam-urbanczyk/cadquery-models/raw/master/extruder_support.png
-    :width: 350
+    :width: 350px
 
 The mach30 project used cadquery to develop a tool that will create a rocket thruster directly from the appropriate equations (`https://opendesignengine.net/projects/yavin-thruster/wiki <https://opendesignengine.net/projects/yavin-thruster/wiki>`_):
 
 .. image:: http://opendesignengine.net/dmsf_files/480?download=
-    :width: 700
+    :width: 700px
 
 This example uses Jupyter notebook to produce a really cool web-based scripting environment (`https://github.com/RustyVermeer/avnb/blob/master/readme.md <https://github.com/RustyVermeer/avnb/blob/master/readme.md>`_):
 
 .. image:: https://github.com/RustyVermeer/cqnb/raw/master/showcase.gif
-    :width: 350
+    :width: 350px
 
 
 We would love to link to your cadquery based project. Just let us know and we'll add it here.
