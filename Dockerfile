@@ -34,7 +34,7 @@ RUN mkdir -p $CQ_HOME
 RUN mkdir -p $CQ_HOME/build_data
 VOLUME $CQ_HOME/build_data
 
-COPY requirements-dev.txt  runtests.py  cq_cmd.py cq_cmd.sh setup.py  README.md MANIFEST setup.cfg $CQ_HOME/
+COPY requirements-dev.txt  runtests.py  cq_cmd.py cq_cmd.sh setup.py  README.rst MANIFEST setup.cfg $CQ_HOME/
 COPY cadquery $CQ_HOME/cadquery
 COPY examples $CQ_HOME/examples
 COPY tests $CQ_HOME/tests
