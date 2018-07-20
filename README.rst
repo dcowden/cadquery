@@ -89,15 +89,19 @@ The CadQuery docker image (`https://hub.docker.com/r/dcowden/cadquery/ <https://
 
 Examples:
 
-Display the Documentation::
+Display the Documentation:
+
+.. code-block:: bash
 
      docker run dcowden/cadquery:latest
 
-Build a local model using stdin/stdout::
+Build a local model using stdin/stdout:
 
-     cat Ex001_Simple_Block.py | docker run -i dcowden/cadquery:latest build --in_spec stdin --format STEP --out_spec stdout
+.. code-block:: bash
 
-     ... STEP output on the console
+    cat Ex001_Simple_Block.py | docker run -i dcowden/cadquery:latest build --in_spec stdin --format STEP --out_spec stdout
+
+    ... STEP output on the console
 
 Build local models and output to the same directory::
 
@@ -123,10 +127,12 @@ This resin mold was modeled using cadquery and then created on a CNC machine:
 .. |hyOzd_cablefix| image:: http://dcowden.github.io/cadquery/_static/hyOzd-cablefix.png
     :width: 350
 
-.. |hyOzd_finished| image:: http://dcowden.github.io/cadquery/_static/hyOzd-finished.png
+.. |hyOzd_finished| image:: http://dcowden.github.io/cadquery/_static/hyOzd-finished.jpg
     :width: 350
 
-The cadquery script is surprisingly short, and allows easily customizing any of the variables::
+The cadquery script is surprisingly short, and allows easily customizing any of the variables:
+
+.. code-block:: python
 
     import cadquery as cq
     from Helpers import show
