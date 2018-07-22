@@ -125,10 +125,10 @@ This resin mold was modeled using cadquery and then created on a CNC machine:
 |hyOzd_cablefix| |hyOzd_finished|
 
 .. |hyOzd_cablefix| image:: http://dcowden.github.io/cadquery/_static/hyOzd-cablefix.png
-    :width: 350px
+    :width: 350 px
 
 .. |hyOzd_finished| image:: http://dcowden.github.io/cadquery/_static/hyOzd-finished.jpg
-    :width: 350px
+    :width: 350 px
 
 The cadquery script is surprisingly short, and allows easily customizing any of the variables:
 
@@ -204,7 +204,7 @@ Thanks go to cadquery contributor hyOzd ( Altu Technology ) for the example!
 KiCad uses cadquery to build high quality models of electrictronic components. (`https://github.com/KiCad/packages3D <https://github.com/KiCad/packages3D>`_)
 
 .. image:: https://forum.freecadweb.org/download/file.php?id=33797&sid=b8584f80928497722e9ee9d582a3fa43
-    :width: 350px
+    :max-width: 350px
 
 This Prusa i3 extruder support uses cadquery to build the model (`https://github.com/adam-urbanczyk/cadquery-models <https://github.com/adam-urbanczyk/cadquery-models>`_):
 
