@@ -57,7 +57,8 @@ It is currently possible to use CadQuery for your own projects in 4 different wa
   * as a plugin running on a Jupyter Notebook server
   * a standalone installation
 
-## I just want to try things out!
+I just want to try things out!
+--------------------------------------------------
 
 If you are interested in trying CadQuery without installing anything, your best option is to experiment with CadQuery scripts running on a Jupyter server.
 
@@ -69,7 +70,8 @@ If you are interested in trying CadQuery without installing anything, your best 
 
 That button will launch a Jupyter Server pre-configured with CadQuery and its dependencies. It contains a folder with many useful examples to showcase CadQuery's features.
 
-## I'd like to use CadQuery on my own setup
+I'd like to use CadQuery on my own setup
+--------------------------------------------------
 
 The easiest way to get started with CadQuery is to Install FreeCAD (version 16+)  (`http://www.freecadweb.org/ <http://www.freecadweb.org/>`_), and then to use our great CadQuery-FreeCAD plugin here: `https://github.com/jmwright/cadquery-freecad-module <https://github.com/jmwright/cadquery-freecad-module>`_
 
@@ -77,7 +79,8 @@ It includes the latest version of cadquery already bundled, and has super-easy i
 
 It has tons of awesome features like integration with FreeCAD so you can see your objects, code-autocompletion, an examples bundle, and script saving/loading. Its definitely the best way to kick the tires!
 
-## I have other ideas and want to run things my own way
+I have other ideas and want to run things my own way
+-----------------------------------------------------------
 
 Awesome! CadQuery is built with this attitude in mind. If none of the existing usage methods work for you, you are more than welcome to forge your own path. You'll probably find the most success using the Docker image. You can alternatively install CadQuery as a standalone package.
 
