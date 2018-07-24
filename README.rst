@@ -50,7 +50,7 @@ We also have a Google Group to make it easy to get help from other CadQuery user
 Getting Started With CadQuery
 ========================================
 
-Installation instructions for all following use cases can be found [here](http://dcowden.github.io/cadquery/installation.html).
+Installation instructions for all following use cases can be found `here <http://dcowden.github.io/cadquery/installation.html>`_.
 
 It is currently possible to use CadQuery for your own projects in 4 different ways:
   * as a plugin for FreeCAD
@@ -300,8 +300,8 @@ Adam Urbańczyk has been working hard on his own `CQ fork <https://github.com/ad
 
 Work has begun on Cadquery 2.0, which will feature:
 
-1. Feature trees, for more powerful selection
-1. Direct use of OpenCascade Community Edition (OCE), so that it is no longer required to install FreeCAD
+#. Feature trees, for more powerful selection
+#. Direct use of OpenCascade Community Edition (OCE), so that it is no longer required to install FreeCAD
 
 The project page can be found here: `https://github.com/dcowden/cadquery/projects/1 <https://github.com/dcowden/cadquery/projects/1>`_
 
