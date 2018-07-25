@@ -30,7 +30,7 @@ install:
 - python setup.py install;
 
 script:
-- python setup.py check -r -a
+- python setup.py check -r -s
 - coverage run runtests.py
 - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
     travis-sphinx build --nowarn --source=doc;
