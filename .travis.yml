@@ -23,12 +23,14 @@ before_install:
     pip install -r requirements-dev.txt;
     pip install travis-sphinx;
     pip install sphinx_rtd_theme;
+    pip install readme_renderer;
   fi
 
 install:
 - python setup.py install;
 
 script:
+- python setup.py check -r -a
 - coverage run runtests.py
 - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
     travis-sphinx build --nowarn --source=doc;
