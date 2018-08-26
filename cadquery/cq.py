@@ -1220,6 +1220,35 @@ class Workplane(CQ):
         p = self._findFromPoint(True)
         return self.lineTo(xCoord, p.y, forConstruction)
 
+    def polarLine(self, distance, angle, forConstruction=False):
+        """
+        Make a line of the given length, at the given angle from the current point
+
+        :param float distance: distance of the end of the line from the current point
+        :param float angle: angle of the vector to the end of the line with the x-axis
+        :return: the Workplane object with the current point at the end of the new line
+       """
+        x = math.cos(math.radians(angle)) * distance
+        y = math.sin(math.radians(angle)) * distance
+
+        return self.line(x, y, forConstruction)
+
+    def polarLineTo(self, distance, angle, forConstruction=False):
+        """
+        Make a line from the current point to the given polar co-ordinates
+
+        Useful if it is more convenient to specify the end location rather than
+        the distance and angle from the current point
+
+        :param float distance: distance of the end of the line from the origin
+        :param float angle: angle of the vector to the end of the line with the x-axis
+        :return: the Workplane object with the current point at the end of the new line
+        """
+        x = math.cos(math.radians(angle)) * distance
+        y = math.sin(math.radians(angle)) * distance
+
+        return self.lineTo(x, y, forConstruction)
+
     #absolute move in current plane, not drawing
     def moveTo(self, x=0, y=0):
         """

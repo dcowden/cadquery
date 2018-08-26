@@ -881,6 +881,23 @@ class TestCadQuery(BaseTest):
         assert(a1.edges().first().val().Length() == a2.edges().first().val().Length())
         assert(a3.edges().first().val().Length() == a4.edges().first().val().Length())
 
+    def testPolarLines(self):
+        """
+        Draw some polar lines and check expected results
+        """
+
+        # Test the PolarLine* functions
+        s = Workplane(Plane.XY())
+        r = s.polarLine(10, 45) \
+            .polarLineTo(10, -45) \
+            .polarLine(10, -180) \
+            .polarLine(-10, -90) \
+            .close()
+
+        # a single wire, 5 edges
+        self.assertEqual(1, r.wires().size())
+        self.assertEqual(5, r.wires().edges().size())
+
     def testLargestDimension(self):
         """
         Tests the largestDimension function when no solids are on the stack and when there are
