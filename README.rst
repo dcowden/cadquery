@@ -1,8 +1,4 @@
-.. raw:: html
-
-    <div align="center">
-        <img src="http://dcowden.github.io/cadquery/_static/cadquery_logo_dark.svg" width="100px" />
-    </div>
+.. image:: http://dcowden.github.io/cadquery/_static/cadquery_logo_dark.svg
 
 What is a CadQuery?
 ========================================
@@ -126,12 +122,15 @@ Projects Using CadQuery
 
 This resin mold was modeled using cadquery and then created on a CNC machine:
 
-.. raw:: html
+|HY0ZD_CABLEFIX| |HY0ZD_FINISHED|
 
-    <div align="center">
-        <img src="http://dcowden.github.io/cadquery/_static/hyOzd-cablefix.png" width="350px" />
-        <img src="http://dcowden.github.io/cadquery/_static/hyOzd-finished.jpg" width="350px" />
-    </div>
+.. |HY0ZD_CABLEFIX| image:: http://dcowden.github.io/cadquery/_static/hyOzd-cablefix.png
+   :alt: Cable-fix resin mold: Rendered
+
+.. |HY0ZD_FINISHED| image:: http://dcowden.github.io/cadquery/_static/hyOzd-finished_thumb.jpg
+   :alt: Cable-fix resin mold: Finised
+   :target: http://dcowden.github.io/cadquery/_static/hyOzd-finished_thumb.jpg
+
 
 The cadquery script is surprisingly short, and allows easily customizing any of the variables:
 
@@ -206,36 +205,26 @@ Thanks go to cadquery contributor hyOzd ( Altu Technology ) for the example!
 
 KiCad uses cadquery to build high quality models of electrictronic components. (`https://github.com/KiCad/packages3D <https://github.com/KiCad/packages3D>`_)
 
-.. raw:: html
-
-    <div align="center">
-        <img src="https://forum.freecadweb.org/download/file.php?id=33797&sid=b8584f80928497722e9ee9d582a3fa43" width="350px" />
-    </div>
+.. image:: http://dcowden.github.io/cadquery/_static/KiCad_Capacitors_SMD_thumb.jpg
+   :target: http://dcowden.github.io/cadquery/_static/KiCad_Capacitors_SMD.jpg
+   :alt: Surface mount capacitors rendered in KiCad
 
 This Prusa i3 extruder support uses cadquery to build the model (`https://github.com/adam-urbanczyk/cadquery-models <https://github.com/adam-urbanczyk/cadquery-models>`_):
 
-.. raw:: html
-
-    <div align="center">
-        <img src="https://github.com/adam-urbanczyk/cadquery-models/raw/master/extruder_support.png" width="350px" />
-    </div>
+.. image:: http://dcowden.github.io/cadquery/_static/extruder_support.png
+   :alt: Prusa i3 extruder support - FreeCAD model render
 
 The mach30 project used cadquery to develop a tool that will create a rocket thruster directly from the appropriate equations (`https://opendesignengine.net/projects/yavin-thruster/wiki <https://opendesignengine.net/projects/yavin-thruster/wiki>`_):
 
-.. raw:: html
-
-    <div align="center">
-        <img src="http://opendesignengine.net/dmsf_files/480?download=" width="350px" />
-    </div>
+.. image:: http://dcowden.github.io/cadquery/_static/march30_landing_page.png
+   :target: https://opendesignengine.net/projects/yavin-thruster/wiki
+   :alt: mach30 project landing page
 
 This example uses Jupyter notebook to produce a really cool web-based scripting environment (`https://github.com/RustyVermeer/avnb/blob/master/readme.md <https://github.com/RustyVermeer/avnb/blob/master/readme.md>`_):
 
-.. raw:: html
-
-    <div align="center">
-        <img src="https://github.com/RustyVermeer/cqnb/raw/master/showcase.gif" width="350px" />
-    </div>
-
+.. image:: http://dcowden.github.io/cadquery/_static/jupyter_showcase_thumb.gif
+   :alt: Jupyter notebook showcased as animation
+   :target: https://github.com/RustyVermeer/cqnb/raw/master/showcase.gif
 
 We would love to link to your cadquery based project. Just let us know and we'll add it here.
 
