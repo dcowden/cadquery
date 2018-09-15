@@ -283,7 +283,7 @@ CadQuery Parts / Assembly Handling
 Work by Fragmuffin is ongoing with the `cqparts <https://github.com/fragmuffin/cqparts>`_ repo.
 
 Moving to Python3 and away from FreeCAD as a dependency
--------------------------------------------
+-------------------------------------------------------------
 
 Adam Urbańczyk has been working hard on his own `CQ fork <https://github.com/adam-urbanczyk/cadquery>`_ which uses only PythonOCC instead of FreeCAD.
 
