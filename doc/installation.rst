@@ -10,8 +10,11 @@ Prerequisites--FreeCAD and Python 2.6 or 2.7
 ----------------------------------------------
 CadQuery requires FreeCAD and Python version 2.6.x or 2.7.x  *Python 3.x is NOT supported*
 
-Ubuntu Command Line Installation
-------------------------------------------
+Installation
+-------------------
+
+Ubuntu
+^^^^^^^^^^^^^^
 
 On Ubuntu, you can type::
 
@@ -21,22 +24,37 @@ On Ubuntu, you can type::
 This `Unix Installation Video <http://youtu.be/InZu8jgaYCA>`_ will walk you through the installation
 
 
-Installation: Other Platforms
-------------------------------------------
+Windows & Mac
+^^^^^^^^^^^^^^^^^^^^
 
    1. Install FreeCAD using the appropriate installer for your platform, on `www.freecadweb.org <http://www.freecadweb.org/wiki/?title=Download>`_
    2. pip install cadquery
 
 This `Windows Installation video <https://www.youtube.com/watch?v=dWw4Y_ah-8k>`_ will walk you through the installation on Windows
 
+
+Anaconda (cross-platform)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Alternatively you can use Anaconda's package management system to install
+cadquery and its dependencies, including FreeCAD.
+
+   1. Install `Anaconda <https://www.anaconda.com/download>`_
+   2. Open an anaconda prompt and run:
+
+::
+
+    conda install -c conda-forge cadquery
+
+
 Test Your Installation
 ------------------------
 
 If all has gone well, you can open a command line/prompt, and type::
 
-      $python
-      $import cadquery
-      $cadquery.Workplane('XY').box(1,2,3).toSvg()
+      $ python
+      >>> import cadquery
+      >>> cadquery.Workplane('XY').box(1,2,3).toSvg()
 
 Adding a Nicer GUI via the cadquery-freecad-module
 --------------------------------------------------------
