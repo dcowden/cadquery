@@ -252,7 +252,7 @@ The primary advantage of OpenSCAD is the large number of already existing model 
 
 CadQuery scripts have several key advantages over OpenSCAD:
 
-#. **The scripts use a standard programming language**, python, and thus can benefit from the associated infrastructure.
+#. **The scripts use a standard programming language**, Python, and thus can benefit from the associated infrastructure.
    This includes many standard libraries and IDEs
 #. **More powerful CAD kernel** OpenCascade is much more powerful than CGAL. Features supported natively
    by OCC include NURBS, splines, surface sewing, STL repair, STEP import/export,  and other complex operations,
