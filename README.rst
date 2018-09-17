@@ -29,7 +29,7 @@ CadQuery is an intuitive, easy-to-use python based language for building paramet
 
 CadQuery has several goals:
 
-* Build lD models with scripts that are as close as possible to how you'd describe the object to a human.
+* Build 3d models with scripts that are as close as possible to how you'd describe the object to a human.
 * Create parametric models that can be very easily customized by end users
 * Output high quality (loss-less) CAD formats like STEP and AMF in addition to traditional STL
 * Provide a non-proprietary, plain text model format that can be edited and executed with only a web browser
@@ -203,7 +203,7 @@ The cadquery script is surprisingly short, and allows easily customizing any of 
 Thanks go to cadquery contributor hyOzd ( Altu Technology ) for the example!
 
 
-KiCad uses cadquery to build high quality models of electrictronic components. (`https://github.com/KiCad/packages3D <https://github.com/KiCad/packages3D>`_)
+KiCad uses cadquery to build high quality models of electronic components. (`https://github.com/KiCad/packages3D <https://github.com/KiCad/packages3D>`_)
 
 .. image:: http://dcowden.github.io/cadquery/_static/KiCad_Capacitors_SMD_thumb.jpg
    :target: http://dcowden.github.io/cadquery/_static/KiCad_Capacitors_SMD.jpg
@@ -237,7 +237,7 @@ revolutionized web development involving javascript.
 
 If you are familiar with jQuery, you will probably recognize several jQuery features that CadQuery uses:
 
-* A fluent api to create clean, easy to read code
+* A fluent API to create clean, easy to read code
 * Language features that make selection and iteration incredibly easy
 * Ability to use the library along side other python libraries
 * Clear and complete documentation, with plenty of samples.
