@@ -18,9 +18,7 @@ from setuptools import setup
 
 #if we are building in travis, use the build number as the sub-minor version
 version = '1.2.0'
-if 'TRAVIS_TAG' in list(os.environ.keys()):
-    version= os.environ['TRAVIS_TAG']
-
+version = os.environ.get('TRAVIS_TAG', None) or version
 
 setup(
     name='cadquery',
@@ -30,7 +28,7 @@ setup(
     author='David Cowden',
     author_email='dave.cowden@gmail.com',
     description='CadQuery is a parametric  scripting language for creating and traversing CAD models',
-    long_description=codecs.open('README.md', 'rb', 'UTF-8').read(),
+    long_description=codecs.open('README.rst', 'rb', 'UTF-8').read(),
     packages=['cadquery','cadquery.contrib','cadquery.freecad_impl','cadquery.plugins','tests'],
     install_requires=['pyparsing'],
     include_package_data=True,
