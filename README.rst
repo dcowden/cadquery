@@ -224,7 +224,7 @@ This example uses Jupyter notebook to produce a really cool web-based scripting 
 
 .. image:: http://dcowden.github.io/cadquery/_static/jupyter_showcase_thumb.png
    :alt: Jupyter notebook showcased as animation
-   :target: https://github.com/RustyVermeer/cqnb/blob/master/showcase.gif
+   :target: https://github.com/RustyVermeer/cqnb
 
 We would love to link to your cadquery based project. Just let us know and we'll add it here.
 
