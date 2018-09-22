@@ -49,10 +49,10 @@ Getting Started With CadQuery
 Installation instructions for all following use cases can be found `here <http://dcowden.github.io/cadquery/installation.html>`_.
 
 It is currently possible to use CadQuery for your own projects in 4 different ways:
-  * as a plugin for FreeCAD
-  * using the Docker Image to operate CadQuery as a CLI
-  * as a plugin running on a Jupyter Notebook server
-  * a standalone installation
+* as a plugin for FreeCAD
+* using the Docker Image to operate CadQuery as a CLI
+* as a plugin running on a Jupyter Notebook server
+* a standalone installation
 
 I just want to try things out!
 --------------------------------------------------
