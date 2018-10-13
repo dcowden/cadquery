@@ -19,7 +19,7 @@ CadQuery is an intuitive, easy-to-use python library for building parametric 3D 
     * Provide a non-proprietary, plain text model format that can be edited and executed with only a web browser
 
 CadQuery is based on
-`FreeCAD <http://sourceforge.net/apps/mediawiki/free-cad/index.php?title=Main_Page>`_,
+`FreeCAD <https://www.freecadweb.org/>`_,
 which is turn based on the open-source `OpenCascade <http://www.opencascade.com/>`_ modelling kernel.
 
 Using CadQuery, you can build fully parametric models with a very small amount of code. For example, this simple script
