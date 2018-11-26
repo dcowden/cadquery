@@ -39,12 +39,16 @@ def importStep(fileName):
     try:
         rshape = Part.read(fileName)
 
-        #Make sure that we extract all the solids
-        solids = []
+        # Extract all solids and surfaces
+        geometry = []
         for solid in rshape.Solids:
-            solids.append(Shape.cast(solid))
+            geometry.append(Shape.cast(solid))
 
-        return cadquery.Workplane("XY").newObject(solids)
+        for shell in rshape.Shells:
+            geometry.append(Shape.cast(shell))
+
+        return cadquery.Workplane("XY").newObject(geometry)
+
     except:
         raise ValueError("STEP File Could not be loaded")
 
