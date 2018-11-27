@@ -519,6 +519,35 @@ class TestCadQuery(BaseTest):
         self.saveModel(s)
         self.assertEqual(6+NUMX*NUMY*2,s.faces().size()) #6 faces for the box, 2 faces for each cylinder
 
+    def testPolarArray(self):
+        """
+        Test for proper placement of elements
+        """
+        elements = 3
+        radius = 10
+        size = [2, 2, 2]
+
+        # Create box at 0 degree location
+        reference = Workplane("XY").moveTo(radius, 0).box(*size)
+
+        # 2 elements at 0 deg (in reference), and 1 at 180 deg
+        s = Workplane("XY").polarArray(radius, 0, 180, elements, fill = False) \
+            .box(*size).union(reference)
+        self.assertEqual(6 + 6 * (elements - 2), s.faces().size())
+
+        # Add box at 90 degree location
+        reference = Workplane("XY").moveTo(0, -radius).box(*size)
+
+        # Elements at 0 (in reference), -90 (in reference), and 180 degrees
+        s = Workplane("XY").polarArray(radius, 0, -180, elements) \
+            .box(*size).union(reference)
+        self.assertEqual(12 + 6 * (elements - 2), s.faces().size())
+
+        # Elements at 0 (in box), 120, and 240
+        s = Workplane("XY").polarArray(radius, 0, 360, elements) \
+            .box(*size).union(reference)
+        self.assertEqual(12 + 6 * (elements - 1), s.faces().size())
+
     def testNestedCircle(self):
         s = Workplane("XY").box(40,40,5).pushPoints([(10,0),(0,10)]).circle(4).circle(2).extrude(4)
         self.saveModel(s)
