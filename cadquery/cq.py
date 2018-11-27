@@ -1082,39 +1082,57 @@ class Workplane(CQ):
 
         return self.pushPoints(lpoints)
 
-    def polarArray(self, radius, stepAngle, startAngle, count):
+    def polarArray(self, radius, angle, startAngle, count, fill=True):
         """
         Creates an polar array of points and pushes them onto the stack.
-        Positive stepAngle values will step the array in the counter-clockwise
-        direction. The 0 degree reference angle is located along the local
-        X-axis.
+        The 0 degree reference angle is located along the local X-axis.
 
         :param radius: Radius of the array. ( > 0)
-        :param stepAngle: Angle between each element of the array. Positive
-            values rotate counter-clockwise, negative clockwise. (!= 0)
+        :param angle: The angle (degrees) to fill with elements. A positive
+            value will fill in the counter-clockwise direction, negative
+            value fills clockwise. If fill is false, it is the angle
+            between elements. (!= 0)
         :param startAngle: Starting angle (degrees) of array. 0 degrees is
             situated along local X-axis. (-360 to 360)
-        :param count: Number of elements in array. ( > 0 )
+        :param count: Number of elements in array. ( > 1 )
         """
 
         if radius <= 0 or count <= 0:
             raise ValueError("Radius and count must be > 0 ")
 
-        if stepAngle == 0:
-            raise ValueError("Step angle cannot be 0")
+        if count <= 1:
+            raise ValueError("Must have more than 1 element in array")
+
+        if angle == 0:
+            raise ValueError("Angle cannot be 0")
 
         if startAngle < -360 or startAngle > 360:
             raise ValueError("Start angle must be in range: -360 to 360")
 
-        # First point initialized to specified angle from X-axis
+        # First element at start angle, convert to cartesian coords
         x = radius * math.cos(math.radians(startAngle))
         y = radius * math.sin(math.radians(startAngle))
         points = [(x, y)]
 
+        """
+        Calculate angle between elements, not needed if fill == False. Due to
+        the first element being located at 0, the actual angle between
+        elements must be angle / (count - 1). Example, a fill angle of 90 with
+        4 elements will set elements at 0, 30, 60, and 90 as expected. Angle /
+        count would place elements at 0, 22.5, 45, and 67.5. If fill angle
+        is a full circle, the correction is not needed.
+        """
+        if fill is True:
+            if angle == 360 or angle == -360:
+                angle = angle / count
+            else:
+                angle = angle / (count - 1)
+
+        # Add additional elements
         for i in range(1, count):
-            angle = math.radians(startAngle + (stepAngle * i))
-            x = radius * math.cos(angle)
-            y = radius * math.sin(angle)
+            phi = math.radians(startAngle + (angle * i))
+            x = radius * math.cos(phi)
+            y = radius * math.sin(phi)
             points.append((x, y))
 
         return self.pushPoints(points)
