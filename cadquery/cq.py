@@ -1082,6 +1082,43 @@ class Workplane(CQ):
 
         return self.pushPoints(lpoints)
 
+    def polarArray(self, radius, stepAngle, startAngle, count):
+        """
+        Creates an polar array of points and pushes them onto the stack.
+        Positive stepAngle values will step the array in the counter-clockwise
+        direction. The 0 degree reference angle is located along the local
+        X-axis.
+
+        :param radius: Radius of the array. ( > 0)
+        :param stepAngle: Angle between each element of the array. Positive
+            values rotate counter-clockwise, negative clockwise. (!= 0)
+        :param startAngle: Starting angle (degrees) of array. 0 degrees is
+            situated along local X-axis. (-360 to 360)
+        :param count: Number of elements in array. ( > 0 )
+        """
+
+        if radius <= 0 or count <= 0:
+            raise ValueError("Radius and count must be > 0 ")
+
+        if stepAngle == 0:
+            raise ValueError("Step angle cannot be 0")
+
+        if startAngle < -360 or startAngle > 360:
+            raise ValueError("Start angle must be in range: -360 to 360")
+
+        # First point initialized to specified angle from X-axis
+        x = radius * math.cos(math.radians(startAngle))
+        y = radius * math.sin(math.radians(startAngle))
+        points = [(x, y)]
+
+        for i in range(1, count):
+            angle = math.radians(startAngle + (stepAngle * i))
+            x = radius * math.cos(angle)
+            y = radius * math.sin(angle)
+            points.append((x, y))
+
+        return self.pushPoints(points)
+
     def pushPoints(self, pntList):
         """
         Pushes a list of points onto the stack as vertices.
