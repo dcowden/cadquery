@@ -68,13 +68,7 @@ def importStepFromURL(url):
         webFile.close()
         tempFile.close()
 
-        rshape = Part.read(tempFile.name)
-
-        #Make sure that we extract all the solids
-        solids = []
-        for solid in rshape.Solids:
-            solids.append(Shape.cast(solid))
-
-        return cadquery.Workplane("XY").newObject(solids)
+        # Read saved file and return CQ Workplane object
+        return importStep(tempFile.name)
     except:
         raise ValueError("STEP File from the URL: " + url + " Could not be loaded")
