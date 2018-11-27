@@ -1097,8 +1097,8 @@ class Workplane(CQ):
         :param count: Number of elements in array. ( > 1 )
         """
 
-        if radius <= 0 or count <= 0:
-            raise ValueError("Radius and count must be must be > 0 ")
+        if radius <= 0:
+            raise ValueError("Radius must be > 0 ")
 
         if count <= 1:
             raise ValueError("Must have more than 1 element in array")
