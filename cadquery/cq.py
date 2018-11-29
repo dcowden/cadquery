@@ -1104,18 +1104,12 @@ class Workplane(CQ):
         y = radius * math.sin(math.radians(startAngle))
         points = [(x, y)]
 
-        """
-        Calculate angle between elements, not needed if fill == False. Due to
-        the first element being located at 0, the actual angle between
-        elements must be angle / (count - 1). Example, a fill angle of 90 with
-        4 elements will set elements at 0, 30, 60, and 90 as expected. Angle /
-        count would place elements at 0, 22.5, 45, and 67.5. If fill angle
-        is a full circle, the correction is not needed.
-        """
-        if fill is True:
-            if angle == 360 or angle == -360:
+        # Calculate angle between elements
+        if fill:
+            if angle % 360 == 0:
                 angle = angle / count
-            else:
+            elif count > 1:
+                # Inclusive start and end
                 angle = angle / (count - 1)
 
         # Add additional elements
