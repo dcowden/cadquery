@@ -1082,6 +1082,45 @@ class Workplane(CQ):
 
         return self.pushPoints(lpoints)
 
+    def polarArray(self, radius, startAngle, angle, count, fill=True):
+        """
+        Creates an polar array of points and pushes them onto the stack.
+        The 0 degree reference angle is located along the local X-axis.
+
+        :param radius: Radius of the array.
+        :param startAngle: Starting angle (degrees) of array. 0 degrees is
+            situated along local X-axis.
+        :param angle: The angle (degrees) to fill with elements. A positive
+            value will fill in the counter-clockwise direction. If fill is
+            false, angle is the angle between elements.
+        :param count: Number of elements in array. ( > 0 )
+        """
+
+        if count <= 0:
+            raise ValueError("No elements in array")
+
+        # First element at start angle, convert to cartesian coords
+        x = radius * math.cos(math.radians(startAngle))
+        y = radius * math.sin(math.radians(startAngle))
+        points = [(x, y)]
+
+        # Calculate angle between elements
+        if fill:
+            if angle % 360 == 0:
+                angle = angle / count
+            elif count > 1:
+                # Inclusive start and end
+                angle = angle / (count - 1)
+
+        # Add additional elements
+        for i in range(1, count):
+            phi = math.radians(startAngle + (angle * i))
+            x = radius * math.cos(phi)
+            y = radius * math.sin(phi)
+            points.append((x, y))
+
+        return self.pushPoints(points)
+
     def pushPoints(self, pntList):
         """
         Pushes a list of points onto the stack as vertices.
