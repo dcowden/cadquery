@@ -1087,27 +1087,17 @@ class Workplane(CQ):
         Creates an polar array of points and pushes them onto the stack.
         The 0 degree reference angle is located along the local X-axis.
 
-        :param radius: Radius of the array. ( > 0)
+        :param radius: Radius of the array.
         :param startAngle: Starting angle (degrees) of array. 0 degrees is
-            situated along local X-axis. (-360 to 360)
+            situated along local X-axis.
         :param angle: The angle (degrees) to fill with elements. A positive
-            value will fill in the counter-clockwise direction, negative
-            value fills clockwise. If fill is false, it is the angle
-            between elements. (!= 0)
-        :param count: Number of elements in array. ( > 1 )
+            value will fill in the counter-clockwise direction. If fill is
+            false, angle is the angle between elements.
+        :param count: Number of elements in array. ( > 0 )
         """
 
-        if radius <= 0:
-            raise ValueError("Radius must be > 0 ")
-
-        if count <= 1:
-            raise ValueError("Must have more than 1 element in array")
-
-        if angle == 0:
-            raise ValueError("Angle cannot be 0")
-
-        if startAngle < -360 or startAngle > 360:
-            raise ValueError("Start angle must be in range: -360 to 360")
+        if count <= 0:
+            raise ValueError("No elements in array")
 
         # First element at start angle, convert to cartesian coords
         x = radius * math.cos(math.radians(startAngle))
