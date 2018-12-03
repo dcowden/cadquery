@@ -39,7 +39,7 @@ Using CadQuery, you can write short, simple scripts that produce high quality CA
 
 Full Documentation and a Welcoming Community
 ===============================================
-You can find the full cadquery documentation at `http://dcowden.github.io/cadquery <http://dcowden.github.io/cadquery>`_
+You can find the full cadquery documentation at `https://dcowden.github.io/cadquery <https://dcowden.github.io/cadquery>`_
 
 We also have a Google Group to make it easy to get help from other CadQuery users. We want you to feel welcome and encourage you to join the group and introduce yourself. We would also love to hear what you are doing with CadQuery. https://groups.google.com/forum/#!forum/cadquery
 
