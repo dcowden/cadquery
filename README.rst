@@ -1,6 +1,16 @@
 .. image:: http://dcowden.github.io/cadquery/_static/cadquery_logo_dark.svg
 
-What is a CadQuery?
+
+# CadQuery is Moving to https://github.com/CadQuery/cadquery!
+
+Version 2.0 development is under way  It uses pythonOCC instead of FreeCAD, and has tons of cool features
+
+*BUT DONT WORRY!*  Version 1.x (this repository ) will be suported until all features are comfortably implemented in the 2.x stream.
+
+We're happy to be moving to a more open organization, but we're sad we're starting over with our stars. Please give us one at our new home!
+
+
+What is CadQuery?
 ========================================
 
 |TRAVIS| |APPVEYOR| |COVERALLS| |VERSION| |LICENSE|
@@ -271,6 +281,13 @@ CadQuery is licensed under the terms of the `Apache Public License, version 2.0 
 
 Ongoing and Future Work
 =============================
+
+CadQuery 2.0 (And future versions)
+-----------------------------------
+
+Cadquery 2.0 is under way. 2.0 is based on pythonOCC directly ( rather than FreeCAD ), and is under heavy development.
+Beginning with version 2.0, CadQuery has moved to a new home at `https://github.com/CadQuery/cadquery` CadQuery/cadquery
+
 
 CadQuery GUI (under development)
 -------------------------------------------
