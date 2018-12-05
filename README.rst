@@ -1,7 +1,8 @@
 .. image:: http://dcowden.github.io/cadquery/_static/cadquery_logo_dark.svg
 
 
-# CadQuery is Moving to https://github.com/CadQuery/cadquery!
+ANNOUNCEMENT!  CadQuery is Moving to https://github.com/CadQuery/cadquery!
+============================================================
 
 Version 2.0 development is under way  It uses pythonOCC instead of FreeCAD, and has tons of cool features
 
