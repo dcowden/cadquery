@@ -136,6 +136,7 @@ def _fc_path():
         # Assume we're dealing with a Mac
         for _PATH in [
                 "/Applications/FreeCAD.app/Contents/lib",
+                "/Applications/FreeCAD.app/Contents/Resources/lib",
                 os.path.join(os.path.expanduser("~"),
                              "Library/Application Support/FreeCAD/lib"),
                 ]:
